@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#111318">
+<title>TOEIC単語帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#111318;--bg2:#181c24;--surface:#1e2330;--surface2:#252d3e;
+  --border:rgba(255,255,255,0.07);--accent:#4f8aff;--rose:#ff6b8a;
+  --gold:#fbbf24;--green:#34d399;--text:#e8eaf0;--text2:#8892a4;--text3:#505a6e;
+  --r:18px;--shadow:0 24px 64px rgba(0,0,0,0.6);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.screen{display:none;position:fixed;inset:0;flex-direction:column;background:var(--bg);overflow-y:auto;overflow-x:hidden}
+.screen.active{display:flex}
+
+/* NAV */
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(17,19,24,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;flex-shrink:0}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-back{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px;line-height:1}
+.nav-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:var(--text)}
+.nav-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);margin-top:1px}
+.nav-right{display:flex;gap:8px}
+.nav-icon-btn{background:var(--surface);border:none;color:var(--text2);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nav-icon-btn:active{transform:scale(.93);background:var(--surface2)}
+
+/* HOME */
+#home{padding-bottom:32px}
+.home-hero{padding:28px 20px 20px;text-align:center}
+.hero-logo{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+.hero-title{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;line-height:1.15;color:var(--text)}
+.hero-title span{color:var(--accent)}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 18px}
+.stat{background:var(--surface);border-radius:14px;padding:14px 10px;text-align:center;border:1px solid var(--border)}
+.stat-n{font-family:'Outfit',sans-serif;font-size:26px;font-weight:800;color:var(--accent);line-height:1}
+.stat-n.rose{color:var(--rose)}.stat-n.gold{color:var(--gold)}
+.stat-l{font-size:10px;color:var(--text2);margin-top:3px}
+.section-head{font-family:'Space Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:0 20px;margin-top:20px;margin-bottom:10px}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px}
+.mode-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;cursor:pointer;text-align:left;transition:all .2s;display:flex;flex-direction:column;gap:6px}
+.mode-btn:active{transform:scale(.96)}
+.mode-btn.full{grid-column:span 2;flex-direction:row;align-items:center;gap:14px}
+.mode-btn.a{border-color:rgba(79,138,255,.3);background:linear-gradient(135deg,rgba(79,138,255,.1),rgba(79,138,255,.03))}
+.mode-btn.b{border-color:rgba(255,107,138,.25);background:linear-gradient(135deg,rgba(255,107,138,.08),rgba(255,107,138,.02))}
+.mode-btn.c{border-color:rgba(251,191,36,.2);background:linear-gradient(135deg,rgba(251,191,36,.07),rgba(251,191,36,.01))}
+.mode-icon{font-size:26px;flex-shrink:0}
+.mode-label{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.mode-desc{font-size:11px;color:var(--text2);line-height:1.5}
+.deck-list{padding:0 18px;display:flex;flex-direction:column;gap:8px}
+.deck-row{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .2s}
+.deck-row:active{transform:scale(.98);background:var(--surface2)}
+.deck-row.recent-deck{border-color:rgba(251,191,36,.3);background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(251,191,36,.01))}
+.deck-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.deck-dot.recent{background:var(--gold)}
+.deck-info{flex:1}
+.deck-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px}
+.deck-count{font-size:11px;color:var(--text2);margin-top:2px}
+.deck-prog{font-family:'Space Mono',monospace;font-size:11px;color:var(--text3)}
+.recent-badge{font-size:9px;background:rgba(251,191,36,.2);color:var(--gold);padding:2px 6px;border-radius:6px;font-family:'Outfit',sans-serif;font-weight:700}
+
+/* STUDY */
+#study{overflow:hidden}
+.study-progress{padding:10px 18px 8px;flex-shrink:0}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.prog-bar{flex:1;height:3px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--rose));border-radius:3px;transition:width .4s ease}
+.prog-txt{font-family:'Space Mono',monospace;font-size:10px;color:var(--text2);white-space:nowrap}
+.mode-tag{display:inline-block;font-size:10px;font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:rgba(79,138,255,.15);color:var(--accent)}
+.mode-tag.weak{background:rgba(255,107,138,.15);color:var(--rose)}
+.card-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 18px;perspective:1400px;overflow:hidden}
+.card-wrap{width:100%;max-width:420px;height:min(62vw,340px);position:relative;cursor:pointer}
+.flashcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.flashcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:22px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;padding:22px 22px 18px;overflow:hidden;box-shadow:var(--shadow)}
+.face-front{background:linear-gradient(145deg,#1e2538,#242c40);border:1px solid rgba(79,138,255,.18)}
+.face-back{background:linear-gradient(145deg,#1e2530,#222c3c);border:1px solid rgba(255,107,138,.15);transform:rotateY(180deg)}
+.face::after{content:'';position:absolute;bottom:-50px;left:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(79,138,255,.07) 0%,transparent 70%);pointer-events:none}
+.face-back::after{background:radial-gradient(circle,rgba(255,107,138,.06) 0%,transparent 70%)}
+.card-corner{position:absolute;top:14px;right:14px}
+.speak-btn{background:rgba(79,138,255,.12);border:none;color:var(--accent);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.speak-btn:active{transform:scale(.9);background:rgba(79,138,255,.25)}
+.speak-btn.playing{color:var(--green);background:rgba(52,211,153,.15)}
+
+/* FRONT card */
+.card-deck-tag{font-family:'Space Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:4px}
+.card-kana{font-size:11px;color:var(--text2);letter-spacing:.05em;min-height:16px;margin-bottom:2px}
+.card-word{font-family:'Outfit',sans-serif;font-size:clamp(20px,5vw,32px);font-weight:800;letter-spacing:.01em;color:var(--text);line-height:1.2;flex:1;display:flex;align-items:center;word-break:break-all}
+.card-comment{font-size:11px;color:var(--text3);line-height:1.5;margin-top:auto;padding-top:8px;border-top:1px solid var(--border);min-height:18px}
+
+/* BACK card */
+.back-kana{font-size:11px;color:var(--text2);margin-bottom:3px}
+.back-word{font-family:'Outfit',sans-serif;font-size:clamp(15px,3.5vw,20px);font-weight:700;color:var(--text);margin-bottom:10px}
+.back-pos{display:inline-block;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(79,138,255,.15);color:var(--accent);margin-bottom:10px}
+.back-meaning{font-size:clamp(17px,4vw,24px);font-weight:700;color:var(--text);line-height:1.4;flex:1;display:flex;align-items:center}
+.back-comment{font-size:11px;color:var(--text3);line-height:1.5;margin-top:auto;padding-top:8px;border-top:1px solid var(--border)}
+.flip-hint{text-align:center;font-size:11px;color:var(--text3);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:4px}
+
+/* ACTIONS - 苦手／覚えた／次へ順 */
+.actions{display:flex;gap:12px;padding:8px 18px 16px;flex-shrink:0}
+.act-btn{flex:1;border:none;border-radius:16px;padding:14px 10px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .2s}
+.act-btn:active{transform:scale(.95)}
+.act-weak{background:rgba(255,107,138,.1);color:var(--rose);border:1px solid rgba(255,107,138,.2)}
+.act-known{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.act-skip{background:var(--surface);color:var(--text2);border:1px solid var(--border)}
+.act-btn .act-icon{font-size:20px}
+.act-btn .act-lbl{font-size:11px}
+
+/* MANAGE */
+#manage{overflow-y:auto}
+.manage-body{padding:14px 18px 40px;display:flex;flex-direction:column;gap:12px}
+.add-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px}
+.add-form h3{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;margin-bottom:2px}
+.form-row{display:flex;gap:8px}
+.form-row input,.form-row select{flex:1}
+input[type=text],select,textarea{background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border .2s;width:100%}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--surface)}
+.btn-add{background:var(--accent);border:none;color:#fff;border-radius:12px;padding:12px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-add:active{transform:scale(.97);opacity:.9}
+.word-table{display:flex;flex-direction:column;gap:6px}
+.word-row{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.word-row.weak-row{border-color:rgba(255,107,138,.2)}
+.word-main{flex:1;min-width:0}
+.word-en{font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.word-jp{font-size:12px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.word-actions{display:flex;gap:6px;flex-shrink:0}
+.icon-btn{background:none;border:none;font-size:16px;cursor:pointer;padding:4px;opacity:.6;transition:opacity .2s}
+.icon-btn:active{opacity:1}
+.search-box{position:relative}
+.search-box input{padding-left:36px}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
+.filter-row{display:flex;gap:8px}
+.filter-chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;color:var(--text2);transition:all .2s;white-space:nowrap}
+.filter-chip.on{background:rgba(79,138,255,.15);border-color:rgba(79,138,255,.4);color:var(--accent)}
+
+/* RESULT */
+#result{align-items:center;justify-content:center;padding:20px}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 24px;width:100%;max-width:420px;text-align:center}
+.result-emoji{font-size:52px;margin-bottom:16px}
+.result-title{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px}
+.result-sub{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:24px}
+.result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px}
+.res-stat{background:var(--bg2);border-radius:12px;padding:12px 8px}
+.res-n{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800}
+.res-n.g{color:var(--green)}.res-n.r{color:var(--rose)}
+.res-l{font-size:10px;color:var(--text2);margin-top:2px}
+.result-btns{display:flex;flex-direction:column;gap:10px}
+.btn-primary{background:var(--accent);border:none;color:#fff;border-radius:14px;padding:14px;font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:14px;padding:13px;font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-secondary:active{transform:scale(.97)}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:13px;color:var(--text);z-index:999;transition:transform .3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.import-area{border:2px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all .2s;color:var(--text2);font-size:13px}
+.import-area:hover{border-color:var(--accent);color:var(--accent)}
+.import-area input{display:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:4px}
+@keyframes swipeRight{to{transform:translateX(120%) rotate(12deg);opacity:0}}
+@keyframes swipeLeft{to{transform:translateX(-120%) rotate(-12deg);opacity:0}}
+.swiping-right .flashcard{animation:swipeRight .28s ease forwards}
+.swiping-left .flashcard{animation:swipeLeft .28s ease forwards}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="home">
+  <div class="topnav">
+    <div>
+      <div class="nav-title">TOEIC 単語帳</div>
+      <div class="nav-sub" id="homeSubtitle">Loading...</div>
+    </div>
+    <div class="nav-right">
+      <button class="nav-icon-btn" onclick="goManage()">⚙️</button>
+    </div>
+  </div>
+  <div class="home-hero">
+    <div class="hero-logo">Your Vocabulary Deck</div>
+    <div class="hero-title">覚えて、<span>超えよう。</span></div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-n" id="statTotal">0</span><div class="stat-l">総単語数</div></div>
+    <div class="stat"><span class="stat-n rose" id="statWeak">0</span><div class="stat-l">苦手単語</div></div>
+    <div class="stat"><span class="stat-n gold" id="statDecks">0</span><div class="stat-l">デッキ数</div></div>
+  </div>
+  <div class="section-head">学習モード</div>
+  <div class="mode-grid">
+    <button class="mode-btn a" onclick="startStudy('all')">
+      <div class="mode-icon">🃏</div>
+      <div class="mode-label">全単語</div>
+      <div class="mode-desc">全語をランダムに学習</div>
+    </button>
+    <button class="mode-btn b" onclick="startStudy('weak')">
+      <div class="mode-icon">🔥</div>
+      <div class="mode-label">苦手だけ</div>
+      <div class="mode-desc">苦手マークした単語のみ</div>
+    </button>
+    <button class="mode-btn c full" onclick="showDeckSelect()">
+      <div class="mode-icon">📂</div>
+      <div><div class="mode-label">デッキ別</div><div class="mode-desc">デッキを選んで学習</div></div>
+    </button>
+  </div>
+  <div class="section-head" style="margin-top:20px" id="recentSectionHead" style="display:none">⏱ 24時間以内に学習したデッキ</div>
+  <div class="deck-list" id="recentDeckList"></div>
+  <div class="section-head" style="margin-top:16px">デッキ一覧</div>
+  <div class="deck-list" id="deckList"></div>
+</div>
+
+<!-- STUDY -->
+<div class="screen" id="study">
+  <div class="topnav">
+    <div class="nav-left">
+      <button class="nav-back" onclick="goHome()">←</button>
+      <div>
+        <div class="nav-title" id="studyTitle">学習中</div>
+        <div class="nav-sub" id="studyDeckLabel"></div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="nav-icon-btn" onclick="shuffleDeck()">🔀</button>
+    </div>
+  </div>
+  <div class="study-progress">
+    <div class="prog-row">
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-txt" id="progTxt">0 / 0</div>
+    </div>
+    <span class="mode-tag" id="modeTag">全単語</span>
+  </div>
+  <div class="card-area" id="cardArea">
+    <div class="card-wrap" id="cardWrap" onclick="flipCard()">
+      <div class="flashcard" id="flashcard">
+        <div class="face face-front">
+          <div class="card-corner">
+            <button class="speak-btn" id="speakFront" onclick="event.stopPropagation();speak()">🔊</button>
+          </div>
+          <div class="card-deck-tag" id="frontDeck"></div>
+          <div class="card-kana" id="frontKana"></div>
+          <div class="card-word" id="frontWord"></div>
+          <div class="card-comment" id="frontComment"></div>
+        </div>
+        <div class="face face-back">
+          <div class="card-corner">
+            <button class="speak-btn" id="speakBack" onclick="event.stopPropagation();speak()">🔊</button>
+          </div>
+          <div class="back-kana" id="backKana"></div>
+          <div class="back-word" id="backWord"></div>
+          <div class="back-pos" id="backPos"></div>
+          <div class="back-meaning" id="backMeaning"></div>
+          <div class="back-comment" id="backComment"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flip-hint" id="flipHint">👆 タップしてめくる</div>
+  </div>
+  <!-- 苦手 / 覚えた / 次へ の順 -->
+  <div class="actions">
+    <button class="act-btn act-weak" onclick="markWeak()">
+      <span class="act-icon">🔥</span><span class="act-lbl">苦手</span>
+    </button>
+    <button class="act-btn act-known" onclick="markKnown()">
+      <span class="act-icon">✓</span><span class="act-lbl">覚えた</span>
+    </button>
+    <button class="act-btn act-skip" onclick="nextCard(true)">
+      <span class="act-icon">→</span><span class="act-lbl">次へ</span>
+    </button>
+  </div>
+</div>
+
+<!-- MANAGE -->
+<div class="screen" id="manage">
+  <div class="topnav">
+    <div class="nav-left">
+      <button class="nav-back" onclick="goHome()">←</button>
+      <div><div class="nav-title">単語管理</div></div>
+    </div>
+    <div class="nav-right">
+      <button class="nav-icon-btn" onclick="exportCSV()">📤</button>
+    </div>
+  </div>
+  <div class="manage-body">
+    <div class="add-form">
+      <h3>➕ 単語を追加</h3>
+      <input type="text" id="newWord" placeholder="英単語 / フレーズ">
+      <input type="text" id="newKana" placeholder="カタカナよみがな">
+      <div class="form-row">
+        <input type="text" id="newPos" placeholder="品詞（名・動・形…）" style="flex:.5">
+        <input type="text" id="newMeaning" placeholder="意味（日本語）">
+      </div>
+      <input type="text" id="newComment" placeholder="備考（任意）">
+      <div class="form-row">
+        <select id="newDeck"><option value="new">新しいデッキ…</option></select>
+        <input type="text" id="newDeckName" placeholder="デッキ名" style="display:none">
+      </div>
+      <button class="btn-add" onclick="addWord()">追加する</button>
+    </div>
+    <div class="import-area" onclick="document.getElementById('csvFile').click()">
+      <input type="file" id="csvFile" accept=".csv" onchange="importCSV(this)">
+      📁 CSVファイルをインポート
+      <div style="font-size:11px;margin-top:4px;color:var(--text3)">FrontText, BackText, Comment の形式</div>
+    </div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="単語を検索…" oninput="renderWordList()">
+    </div>
+    <div class="filter-row" style="overflow-x:auto;padding-bottom:4px" id="filterChips"></div>
+    <div class="word-table" id="wordTable"></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result">
+  <div class="result-card">
+    <div class="result-emoji" id="resultEmoji">🎉</div>
+    <div class="result-title" id="resultTitle">セッション完了！</div>
+    <div class="result-sub" id="resultSub"></div>
+    <div class="result-stats">
+      <div class="res-stat"><div class="res-n g" id="resKnown">0</div><div class="res-l">覚えた</div></div>
+      <div class="res-stat"><div class="res-n r" id="resWeak">0</div><div class="res-l">苦手</div></div>
+      <div class="res-stat"><div class="res-n" id="resSkip">0</div><div class="res-l">スキップ</div></div>
+    </div>
+    <div class="result-btns">
+      <button class="btn-primary" onclick="restartStudy()">🔄 もう一度</button>
+      <button class="btn-secondary" onclick="studyWeak()">🔥 苦手だけ復習</button>
+      <button class="btn-secondary" onclick="goHome()">🏠 ホームへ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const RAW = [
+{id:1,word:"major",kana:"メジャー",pos:"名",meaning:"専攻科目",comment:"ex. My major is psychology",deck:"01-1"},
+{id:2,word:"subject",kana:"サブジェクト",pos:"名",meaning:"教科",comment:"ex. What subject do you like?",deck:"01-1"},
+{id:3,word:"colleague",kana:"コリーグ",pos:"名",meaning:"同僚",comment:"≒coworker",deck:"01-1"},
+{id:4,word:"department",kana:"ディパートメント",pos:"名",meaning:"部署",comment:"",deck:"01-1"},
+{id:5,word:"always",kana:"オールウェイズ",pos:"副",meaning:"常に、いつも（100％）",comment:"",deck:"01-1"},
+{id:6,word:"usually",kana:"ユージュアリー",pos:"副",meaning:"たいてい、普段から（90％）",comment:"",deck:"01-1"},
+{id:7,word:"generally",kana:"ジェネラリー",pos:"副",meaning:"たいてい、普段から（90％）",comment:"",deck:"01-1"},
+{id:8,word:"often",kana:"オーフン",pos:"副",meaning:"しばしば、よく（70％）",comment:"",deck:"01-1"},
+{id:9,word:"sometimes",kana:"サムタイムズ",pos:"副",meaning:"ときどき（50%）",comment:"",deck:"01-1"},
+{id:10,word:"at",kana:"アット",pos:"前",meaning:"その場にいるニュアンス",comment:"※She is at school.",deck:"01-1"},
+{id:11,word:"in the",kana:"イン ザ",pos:"前",meaning:"その空間内、その範囲にいるニュアンス",comment:"※She is in the school.",deck:"01-1"},
+{id:12,word:"get to",kana:"ゲット トゥ",pos:"動",meaning:"着く、到着する",comment:"※arrive…到着する（0121）",deck:"01-1"},
+{id:13,word:"get a haircut",kana:"ゲット ア ヘアカット",pos:"動",meaning:"髪を切る",comment:"",deck:"01-1"},
+{id:14,word:"make a presentation",kana:"メイク ア プレゼンテーション",pos:"動",meaning:"プレゼンする",comment:"",deck:"01-1"},
+{id:15,word:"ask for",kana:"アスク フォー",pos:"動",meaning:"求める、頼む",comment:"",deck:"01-1"},
+{id:16,word:"might",kana:"マイト",pos:"助",meaning:"ひょっとすると〜するかもしれない",comment:"",deck:"01-1"},
+{id:17,word:"go for a walk",kana:"ゴー フォー ア ウォーク",pos:"動",meaning:"散歩する",comment:"",deck:"01-1"},
+{id:18,word:"mustn't",kana:"マストント",pos:"",meaning:"must not の短縮形",comment:"",deck:"01-1"},
+{id:19,word:"must not",kana:"マスト ノット",pos:"",meaning:"〜してはならない",comment:"",deck:"01-1"},
+{id:20,word:"don't have to",kana:"ドント ハブ トゥ",pos:"",meaning:"〜する必要はない",comment:"",deck:"01-1"},
+{id:21,word:"paintings",kana:"ペインティングズ",pos:"名",meaning:"絵画",comment:"",deck:"01-1"},
+{id:22,word:"pictures",kana:"ピクチャーズ",pos:"名",meaning:"写真、イラスト、画像",comment:"",deck:"01-1"},
+{id:23,word:"apply",kana:"アプライ",pos:"動",meaning:"申し込む",comment:"※apply to 〜…申し込む（0047）",deck:"01-1"},
+{id:24,word:"to walk my dog",kana:"トゥ ウォーク マイ ドッグ",pos:"動",meaning:"犬の散歩をする",comment:"",deck:"01-1"},
+{id:25,word:"grocery",kana:"グロウサリー",pos:"名",meaning:"食料品店",comment:"",deck:"01-1"},
+{id:26,word:"groceries",kana:"グロウサリーズ",pos:"名",meaning:"食料品",comment:"",deck:"01-1"},
+{id:27,word:"fold",kana:"フォールド",pos:"動",meaning:"折る、たたむ",comment:"※hold…開催する、持っている（0192）",deck:"01-1"},
+{id:28,word:"drawers",kana:"ドロワーズ",pos:"名",meaning:"引き出し",comment:"",deck:"01-1"},
+{id:29,word:"put on〜",kana:"プット オン",pos:"動",meaning:"着る、身につける",comment:"",deck:"01-1"},
+{id:30,word:"remove",kana:"リムーブ",pos:"動",meaning:"脱ぐ",comment:"※take off…脱ぐ、離陸する",deck:"01-1"},
+{id:31,word:"adjust",kana:"アジャスト",pos:"動",meaning:"調整する",comment:"",deck:"01-1"},
+{id:32,word:"wait in line",kana:"ウェイト イン ライン",pos:"動",meaning:"並んで待つ",comment:"",deck:"01-1"},
+{id:33,word:"What day is it today?",kana:"ワット デイ イズ イット トゥデイ",pos:"",meaning:"今日は何曜日ですか？",comment:"",deck:"01-1"},
+{id:34,word:"How is it?",kana:"ハウ イズ イット",pos:"",meaning:"それどんな感じ？",comment:"",deck:"01-1"},
+{id:35,word:"Take your time.",kana:"テイク ユア タイム",pos:"",meaning:"ごゆっくり",comment:"",deck:"01-1"},
+{id:36,word:"every other friday.",kana:"エブリ アザー フライデー",pos:"",meaning:"隔週金曜日",comment:"",deck:"01-1"},
+{id:37,word:"personnel",kana:"パーソネル",pos:"形",meaning:"人事の、人事課の",comment:"",deck:"01-1"},
+{id:38,word:"personal",kana:"パーソナル",pos:"形",meaning:"個人的な、一身上の",comment:"",deck:"01-1"},
+{id:39,word:"fever",kana:"フィーバー",pos:"名",meaning:"熱",comment:"※I had a fever last week",deck:"01-1"},
+{id:40,word:"pale",kana:"ペイル",pos:"形",meaning:"青ざめた",comment:"",deck:"01-1"},
+{id:41,word:"withdrew",kana:"ウィズドゥルー",pos:"動",meaning:"お金を引き出す",comment:"",deck:"01-2"},
+{id:42,word:"pollution",kana:"ポリューション",pos:"名",meaning:"汚染",comment:"",deck:"01-2"},
+{id:43,word:"significant",kana:"シグニフィカント",pos:"形",meaning:"重大な",comment:"",deck:"01-2"},
+{id:44,word:"mow",kana:"モウ",pos:"動",meaning:"刈り取る",comment:"",deck:"01-2"},
+{id:45,word:"emission",kana:"イミッション",pos:"名",meaning:"排出、放出",comment:"",deck:"01-2"},
+{id:46,word:"within",kana:"ウィズィン",pos:"前",meaning:"〜以内で",comment:"",deck:"01-2"},
+{id:47,word:"primary",kana:"プライマリー",pos:"形",meaning:"主要な",comment:"",deck:"01-2"},
+{id:48,word:"transportation",kana:"トランスポーテーション",pos:"名",meaning:"交通機関",comment:"",deck:"01-2"},
+{id:49,word:"treat",kana:"トリート",pos:"動",meaning:"扱う、治療する（0619）",comment:"※treat A to Bで、AにBを奢る",deck:"01-2"},
+{id:50,word:"fill out",kana:"フィル アウト",pos:"動",meaning:"記入する",comment:"",deck:"01-2"},
+{id:51,word:"make progress",kana:"メイク プログレス",pos:"動",meaning:"進歩する",comment:"",deck:"01-2"},
+{id:52,word:"under way",kana:"アンダー ウェイ",pos:"",meaning:"進行中である",comment:"≒in construction",deck:"01-2"},
+{id:53,word:"suburb",kana:"サバーブ",pos:"名",meaning:"郊外",comment:"↔urban area, city",deck:"01-2"},
+{id:54,word:"degrees celsius",kana:"ディグリーズ セルシウス",pos:"",meaning:"摂氏〜度",comment:"※35 degrees celsius",deck:"01-2"},
+{id:55,word:"annual",kana:"アニュアル",pos:"形",meaning:"年次の、1年の",comment:"",deck:"01-2"},
+{id:56,word:"flatly",kana:"フラットリー",pos:"副",meaning:"きっぱりと",comment:"※flat…空気の抜けた（0627）",deck:"01-2"},
+{id:57,word:"replaced A with B",kana:"リプレイスト エー ウィズ ビー",pos:"動",meaning:"AをBに取り替える",comment:"",deck:"01-2"},
+{id:58,word:"drought",kana:"ドラウト",pos:"名",meaning:"干ばつ",comment:"",deck:"01-2"},
+{id:59,word:"theft",kana:"セフト",pos:"名",meaning:"窃盗",comment:"※Grand theft Auto",deck:"01-2"},
+{id:60,word:"occur",kana:"オカー",pos:"動",meaning:"発生する",comment:"",deck:"01-2"},
+{id:61,word:"flooding",kana:"フラッディング",pos:"名",meaning:"洪水",comment:"",deck:"01-2"},
+{id:62,word:"replacement",kana:"リプレイスメント",pos:"名",meaning:"交換品、取り換え品",comment:"",deck:"01-2"},
+{id:63,word:"Parliment House",kana:"パーラメント ハウス",pos:"名",meaning:"国会議事堂",comment:"※Parliment…議会",deck:"01-2"},
+{id:64,word:"mention A to B",kana:"メンション エー トゥ ビー",pos:"動",meaning:"AのことをBに言う",comment:"※Inform A of B…AのことをBに知らせる（0803）",deck:"01-2"},
+{id:65,word:"light bulb",kana:"ライト バルブ",pos:"名",meaning:"電球",comment:"",deck:"01-2"},
+{id:66,word:"fortune",kana:"フォーチュン",pos:"名",meaning:"財産、運",comment:"≒property(0008)",deck:"01-2"},
+{id:67,word:"take step",kana:"テイク ステップ",pos:"動",meaning:"措置を取る",comment:"",deck:"01-2"},
+{id:68,word:"bulletin board",kana:"ブリティン ボード",pos:"名",meaning:"掲示板",comment:"",deck:"01-2"},
+{id:69,word:"restructuring",kana:"リストラクチャリング",pos:"名",meaning:"リストラ",comment:"",deck:"01-2"},
+{id:70,word:"immigrant",kana:"イミグラント",pos:"名",meaning:"移民",comment:"",deck:"01-2"},
+{id:71,word:"refugees",kana:"レフュジーズ",pos:"名",meaning:"難民",comment:"",deck:"01-2"},
+{id:72,word:"isolation",kana:"アイソレーション",pos:"名",meaning:"孤独",comment:"",deck:"01-2"},
+{id:73,word:"citizenship",kana:"シティズンシップ",pos:"名",meaning:"市民権、公民権",comment:"",deck:"01-2"},
+{id:74,word:"cooperate",kana:"コウオペレイト",pos:"動",meaning:"協力する",comment:"",deck:"01-2"},
+{id:75,word:"efficient",kana:"イフィシェント",pos:"形",meaning:"効率的な",comment:"",deck:"01-2"},
+{id:76,word:"medium",kana:"ミーディアム",pos:"名",meaning:"媒体",comment:"※単体…medium、複数…media",deck:"01-2"},
+{id:77,word:"pronounce",kana:"プロナウンス",pos:"動",meaning:"発音する",comment:"",deck:"01-2"},
+{id:78,word:"how to get to 〜",kana:"ハウ トゥ ゲット トゥ",pos:"",meaning:"〜への行き方",comment:"",deck:"01-2"},
+{id:79,word:"I didn't know who to talk to.",kana:"アイ ディドント ノウ フー トゥ トーク トゥ",pos:"",meaning:"誰に相談したらいいのかわかりません",comment:"",deck:"01-2"},
+{id:80,word:"symptom",kana:"シンプトム",pos:"名",meaning:"症状",comment:"",deck:"01-2"},
+{id:81,word:"applicant",kana:"アプリカント",pos:"名",meaning:"申込者、応募者",comment:"",deck:"01-3"},
+{id:82,word:"less",kana:"レス",pos:"副",meaning:"（副詞・形容詞を修飾して）…ほどでもなく",comment:"",deck:"01-3"},
+{id:83,word:"resignation",kana:"レジグネーション",pos:"名",meaning:"辞任",comment:"",deck:"01-3"},
+{id:84,word:"marijuana",kana:"マリファーナ",pos:"名",meaning:"マリファナ",comment:"",deck:"01-3"},
+{id:85,word:"run short",kana:"ラン ショート",pos:"動",meaning:"不足する",comment:"※run out of …使い果たす（0770）",deck:"01-3"},
+{id:86,word:"decline",kana:"ディクライン",pos:"動",meaning:"後退する、衰退する",comment:"",deck:"01-3"},
+{id:87,word:"stock price",kana:"ストック プライス",pos:"名",meaning:"株価",comment:"※stockholder,shareholder…株主",deck:"01-3"},
+{id:88,word:"continue to〜",kana:"コンティニュー トゥ",pos:"動",meaning:"〜し続ける",comment:"",deck:"01-3"},
+{id:89,word:"some",kana:"サム",pos:"代",meaning:"いくつかの、何人かの",comment:"",deck:"03-1"},
+{id:90,word:"severe",kana:"シビア",pos:"形",meaning:"厳しい、容赦のない",comment:"",deck:"03-1"},
+{id:91,word:"fully",kana:"フリー",pos:"副",meaning:"完全に",comment:"",deck:"03-1"},
+{id:92,word:"frequency",kana:"フリークエンシー",pos:"名",meaning:"頻度",comment:"形 frequent…頻繁な 副 frequently…頻繁に",deck:"03-1"},
+{id:93,word:"hand out",kana:"ハンド アウト",pos:"",meaning:"配る",comment:"※hand in（提出する）＝turn in, submit",deck:"03-1"},
+{id:94,word:"pile up",kana:"パイル アップ",pos:"",meaning:"積み重ねる",comment:"",deck:"03-1"},
+{id:95,word:"architect",kana:"アーキテクト",pos:"名",meaning:"建築家",comment:"",deck:"03-1"},
+{id:96,word:"a few / few",kana:"ア フュー / フュー",pos:"",meaning:"少しはある / ほとんどない",comment:"",deck:"03-1"},
+{id:97,word:"bankrupt",kana:"バンクラプト",pos:"動",meaning:"破産した",comment:"",deck:"03-1"},
+{id:98,word:"block off",kana:"ブロック オフ",pos:"",meaning:"封鎖する",comment:"",deck:"03-1"},
+{id:99,word:"install",kana:"インストール",pos:"動",meaning:"取り付ける、固定する、着任させる",comment:"",deck:"03-1"},
+{id:100,word:"make an effort",kana:"メイク アン エフォート",pos:"",meaning:"努力する",comment:"",deck:"03-1"},
+{id:101,word:"renew",kana:"リニュー",pos:"動",meaning:"更新する",comment:"",deck:"03-1"},
+{id:102,word:"spread",kana:"スプレッド",pos:"動",meaning:"広がる",comment:"spread love♡",deck:"03-1"},
+{id:103,word:"flu",kana:"フルー",pos:"名",meaning:"インフルエンザ",comment:"",deck:"03-1"},
+{id:104,word:"patience",kana:"ペイシェンス",pos:"名",meaning:"忍耐力、我慢",comment:"",deck:"03-1"},
+{id:105,word:"obey",kana:"オベイ",pos:"動",meaning:"従う・服従する",comment:"follow 0516",deck:"03-1"},
+{id:106,word:"ethical",kana:"エシカル",pos:"形",meaning:"倫理的な",comment:"",deck:"03-1"},
+{id:107,word:"on a ~ basis",kana:"オン ア ベイシス",pos:"",meaning:"〜という形態で",comment:"ex. She works on a part time basis.",deck:"03-1"},
+{id:108,word:"nail",kana:"ネイル",pos:"名",meaning:"爪",comment:"",deck:"03-1"},
+{id:109,word:"wind",kana:"ワインド",pos:"動",meaning:"曲がりくねる",comment:"",deck:"03-1"},
+{id:110,word:"dose",kana:"ドース",pos:"名",meaning:"服用量",comment:"",deck:"03-1"},
+{id:111,word:"Ship / Send out",kana:"シップ / センド アウト",pos:"",meaning:"物流的な意味での送る",comment:"",deck:"03-1"},
+{id:112,word:"poll",kana:"ポール",pos:"名",meaning:"世論調査",comment:"",deck:"03-1"},
+{id:113,word:"come out",kana:"カム アウト",pos:"動",meaning:"発表する",comment:"",deck:"03-1"},
+{id:114,word:"Be sure to do",kana:"ビー シュア トゥ ドゥ",pos:"",meaning:"必ず〜しなさい",comment:"",deck:"03-1"},
+{id:115,word:"resign",kana:"リザイン",pos:"動",meaning:"辞任する",comment:"",deck:"03-1"},
+{id:116,word:"predict",kana:"プリディクト",pos:"動",meaning:"予想する・予言する",comment:"",deck:"03-1"},
+{id:117,word:"matter",kana:"マター",pos:"名",meaning:"事柄・事件",comment:"",deck:"03-1"},
+{id:118,word:"donation",kana:"ドネーション",pos:"名",meaning:"寄付",comment:"",deck:"03-1"},
+{id:119,word:"in appreciation of",kana:"イン アプリシエーション オブ",pos:"",meaning:"〜に感謝して",comment:"",deck:"03-1"},
+{id:120,word:"under construction",kana:"アンダー コンストラクション",pos:"",meaning:"建設中",comment:"",deck:"03-1"},
+{id:121,word:"hammer",kana:"ハマー",pos:"動",meaning:"打ちつける",comment:"",deck:"03-1"},
+{id:122,word:"completely",kana:"コンプリートリー",pos:"副",meaning:"完全に",comment:"",deck:"03-1"},
+{id:123,word:"detect",kana:"ディテクト",pos:"動",meaning:"検知する、発見する",comment:"",deck:"03-1"},
+{id:124,word:"currently",kana:"カレントリー",pos:"副",meaning:"現在の、今のところ",comment:"",deck:"03-1"},
+{id:125,word:"sound",kana:"サウンド",pos:"動",meaning:"〜に思える",comment:"",deck:"03-1"},
+{id:126,word:"on the track",kana:"オン ザ トラック",pos:"",meaning:"追跡している状態",comment:"",deck:"03-1"},
+{id:127,word:"new line",kana:"ニュー ライン",pos:"",meaning:"新商品",comment:"",deck:"03-1"},
+{id:128,word:"independence",kana:"インディペンデンス",pos:"名",meaning:"独立",comment:"※independent...独立した",deck:"03-1"},
+{id:129,word:"neglect",kana:"ネグレクト",pos:"動",meaning:"忘れる、軽視する",comment:"",deck:"03-2"},
+{id:130,word:"tow",kana:"トウ",pos:"動",meaning:"牽引する、引っぱる",comment:"ex. tow truck…レッカー車",deck:"03-2"},
+{id:131,word:"characteristics",kana:"キャラクタリスティクス",pos:"名",meaning:"特徴",comment:"",deck:"03-2"},
+{id:132,word:"completion",kana:"コンプリーション",pos:"名",meaning:"完成",comment:"※complete…完成させる",deck:"03-2"},
+{id:133,word:"auditorium",kana:"オーディトリアム",pos:"名",meaning:"講堂、公会堂",comment:"",deck:"03-2"},
+{id:134,word:"professor",kana:"プロフェッサー",pos:"名",meaning:"教授・先生",comment:"※professional（職業） 0652",deck:"03-2"},
+{id:135,word:"site",kana:"サイト",pos:"名",meaning:"敷地、用地",comment:"ex. construction site...建設用地",deck:"03-2"},
+{id:136,word:"manage",kana:"マネージ",pos:"動",meaning:"なんとか〜する",comment:"",deck:"03-2"},
+{id:137,word:"call off",kana:"コール オフ",pos:"",meaning:"中止を宣言する",comment:"put off (0768) 延期する",deck:"03-2"},
+{id:138,word:"on purpose",kana:"オン パーパス",pos:"副",meaning:"故意に、意図的に",comment:"",deck:"03-2"},
+{id:139,word:"criminal",kana:"クリミナル",pos:"形",meaning:"刑事上の",comment:"ex. criminal offense 刑事上の罪",deck:"03-2"},
+{id:140,word:"become familiar with ~",kana:"ビカム ファミリアー ウィズ",pos:"",meaning:"～に精通する",comment:"be familiar with",deck:"03-2"},
+{id:141,word:"job opening",kana:"ジョブ オープニング",pos:"名",meaning:"仕事の空き、欠員",comment:"",deck:"03-2"},
+{id:142,word:"plant",kana:"プラント",pos:"名",meaning:"工場",comment:"※「植物」の意味もある",deck:"03-2"},
+{id:143,word:"line",kana:"ライン",pos:"動",meaning:"〜に沿って並ぶ",comment:"ex. A row of trees line the street.",deck:"03-2"},
+{id:144,word:"politician",kana:"ポリティシャン",pos:"名",meaning:"政治家",comment:"political…政治の",deck:"03-2"},
+{id:145,word:"send out",kana:"センド アウト",pos:"",meaning:"送り出す、発送する",comment:"",deck:"03-2"},
+{id:146,word:"trim",kana:"トリム",pos:"動",meaning:"切り取る",comment:"",deck:"03-2"},
+{id:147,word:"harmful",kana:"ハームフル",pos:"形",meaning:"有害な",comment:"",deck:"03-2"},
+{id:148,word:"investment",kana:"インベストメント",pos:"名",meaning:"投資",comment:"※invest…投資する",deck:"03-2"},
+{id:149,word:"prime minister",kana:"プライム ミニスター",pos:"名",meaning:"総理大臣",comment:"",deck:"03-2"},
+{id:150,word:"seek",kana:"シーク",pos:"動",meaning:"探す、求める",comment:"",deck:"03-2"},
+{id:151,word:"capable",kana:"ケイパブル",pos:"形",meaning:"有能な",comment:"capability…能力",deck:"03-2"},
+{id:152,word:"private business",kana:"プライベート ビジネス",pos:"",meaning:"民間企業",comment:"",deck:"03-2"},
+{id:153,word:"relevant",kana:"レレバント",pos:"形",meaning:"関連する",comment:"※relative(名)親戚",deck:"03-2"},
+{id:154,word:"be good at ~",kana:"ビー グッド アット",pos:"",meaning:"～が得意だ",comment:"",deck:"03-2"},
+{id:155,word:"pay increase",kana:"ペイ インクリース",pos:"",meaning:"賃上げ",comment:"pay increase = pay raise",deck:"03-2"},
+{id:156,word:"leat up to〜",kana:"リード アップ トゥ",pos:"",meaning:"〜につながる、続く",comment:"※lead to …至る、つながる（0777）",deck:"04-1"},
+{id:157,word:"sign",kana:"サイン",pos:"名",meaning:"掲示物、看板、（署名）",comment:"",deck:"04-1"},
+{id:158,word:"belife",kana:"ビリーフ",pos:"名",meaning:"信念、信条",comment:"",deck:"04-1"},
+{id:159,word:"brief",kana:"ブリーフ",pos:"形",meaning:"簡単な、手短な",comment:"",deck:"04-1"},
+{id:160,word:"disordefly",kana:"ディスオーダリー",pos:"形",meaning:"無秩序な、無法の",comment:"",deck:"04-1"},
+{id:161,word:"surgery",kana:"サージェリー",pos:"名",meaning:"外科、外科手術",comment:"※surgical…外科の",deck:"04-1"},
+{id:162,word:"poverty",kana:"ポバティー",pos:"名",meaning:"貧困",comment:"",deck:"04-1"},
+{id:163,word:"raising children",kana:"レイジング チルドレン",pos:"名",meaning:"子育て",comment:"",deck:"04-1"},
+{id:164,word:"rewarding",kana:"リウォーディング",pos:"形",meaning:"やりがいのある",comment:"",deck:"04-1"},
+{id:165,word:"liability",kana:"ライアビリティー",pos:"名",meaning:"負債、責任",comment:"",deck:"04-1"},
+{id:166,word:"obligation",kana:"オブリゲーション",pos:"名",meaning:"責務、義務",comment:"",deck:"04-1"},
+{id:167,word:"admission",kana:"アドミッション",pos:"名",meaning:"入場料",comment:"※admit…認める（0559）",deck:"04-1"},
+{id:168,word:"temperament",kana:"テンパーメント",pos:"名",meaning:"気質、性質",comment:"※temperature…気温",deck:"04-1"},
+{id:169,word:"charactelistic",kana:"キャラクタリスティック",pos:"名",meaning:"特徴、性質",comment:"",deck:"04-1"},
+{id:170,word:"feature",kana:"フィーチャー",pos:"名",meaning:"特徴、性質",comment:"",deck:"04-1"},
+{id:171,word:"expectation",kana:"エクスペクテーション",pos:"名",meaning:"期待、予想",comment:"",deck:"04-1"},
+{id:172,word:"predict",kana:"プリディクト",pos:"動",meaning:"期待する",comment:"",deck:"04-1"},
+{id:173,word:"suspend",kana:"サスペンド",pos:"動",meaning:"延期する、見合わせる",comment:"※put off, postpone, delay…延期する",deck:"04-1"},
+{id:174,word:"emigrate",kana:"エミグレイト",pos:"動",meaning:"移住する",comment:"",deck:"04-1"},
+{id:175,word:"religious",kana:"リリジャス",pos:"形",meaning:"宗教的な",comment:"",deck:"04-1"},
+{id:176,word:"deteriorate",kana:"ディテリオレイト",pos:"動",meaning:"悪化する",comment:"",deck:"04-1"},
+{id:177,word:"go out of",kana:"ゴー アウト オブ",pos:"動",meaning:"消える、なくなる",comment:"",deck:"04-1"},
+{id:178,word:"congestion",kana:"コンジェスチョン",pos:"名",meaning:"渋滞、過密",comment:"",deck:"04-1"},
+{id:179,word:"throug",kana:"スルー",pos:"前",meaning:"〜まで、〜の間ずっと",comment:"",deck:"04-1"},
+{id:180,word:"operation",kana:"オペレーション",pos:"名",meaning:"手術、軍事行動",comment:"",deck:"04-1"},
+{id:181,word:"testimoney",kana:"テスティモニー",pos:"名",meaning:"証言",comment:"",deck:"04-1"},
+{id:182,word:"explosive",kana:"エクスプロウシブ",pos:"名",meaning:"爆発物、【形】爆発の",comment:"",deck:"04-1"},
+{id:183,word:"behavior",kana:"ビヘイビアー",pos:"名",meaning:"行動、態度",comment:"",deck:"04-1"},
+{id:184,word:"handwriting",kana:"ハンドライティング",pos:"名",meaning:"筆跡",comment:"",deck:"04-1"},
+{id:185,word:"lean",kana:"リーン",pos:"動",meaning:"立てかける、より掛かる、傾く",comment:"",deck:"04-1"},
+{id:186,word:"astronomy",kana:"アストロノミー",pos:"名",meaning:"天文学",comment:"",deck:"04-1"},
+{id:187,word:"atmosphere",kana:"アトモスフィア",pos:"名",meaning:"大気、大気圏、空気",comment:"",deck:"04-1"},
+{id:188,word:"fooding",kana:"フッティング",pos:"名",meaning:"足場、基盤",comment:"",deck:"04-1"},
+{id:189,word:"As long as I live.",kana:"アズ ロング アズ アイ リブ",pos:"",meaning:"私の生きている限り（期間）",comment:"",deck:"04-1"},
+{id:190,word:"As far as I know.",kana:"アズ ファー アズ アイ ノウ",pos:"",meaning:"私の知っている限り（範囲）",comment:"",deck:"04-1"},
+{id:191,word:"in about XX minutes",kana:"イン アバウト エックスエックス ミニッツ",pos:"",meaning:"約XX分後に",comment:"",deck:"04-1"},
+{id:192,word:"order",kana:"オーダー",pos:"名",meaning:"秩序",comment:"",deck:"04-1"},
+{id:193,word:"sincerely",kana:"シンシアリー",pos:"副",meaning:"心から、本当に",comment:"",deck:"04-1"},
+{id:194,word:"inconvenience",kana:"インコンビニエンス",pos:"名",meaning:"不便、不都合、迷惑",comment:"",deck:"04-1"},
+{id:195,word:"union",kana:"ユニオン",pos:"名",meaning:"労働組合",comment:"",deck:"04-1"},
+{id:196,word:"toward",kana:"トワード",pos:"前",meaning:"〜の方向を向いて",comment:"",deck:"04-2"},
+{id:197,word:"proud",kana:"プラウド",pos:"形",meaning:"誇らしげな、高慢な",comment:"",deck:"04-2"},
+{id:198,word:"region",kana:"リージョン",pos:"名",meaning:"地域、地区",comment:"",deck:"04-2"},
+{id:199,word:"religion",kana:"リリジョン",pos:"名",meaning:"宗教",comment:"",deck:"04-2"},
+{id:200,word:"seem to do 〜",kana:"シーム トゥ ドゥ",pos:"",meaning:"〜するように見える",comment:"≒appear to do（0585）",deck:"04-2"},
+{id:201,word:"fueling",kana:"フューエリング",pos:"動",meaning:"燃料を投じる、助長する",comment:"",deck:"04-2"},
+{id:202,word:"in demand",kana:"イン ディマンド",pos:"",meaning:"需要の中で",comment:"",deck:"04-2"},
+{id:203,word:"shortage",kana:"ショーテージ",pos:"名",meaning:"不足",comment:"※run short…不足する",deck:"04-2"},
+{id:204,word:"divorce",kana:"ダイボース",pos:"名",meaning:"離婚、【動】離婚する",comment:"",deck:"04-2"},
+{id:205,word:"divorte",kana:"ダイボート",pos:"動",meaning:"捧げる",comment:"",deck:"04-2"},
+{id:206,word:"competitive",kana:"コンペティティブ",pos:"形",meaning:"競争の激しい",comment:"",deck:"04-2"},
+{id:207,word:"detect",kana:"ディテクト",pos:"動",meaning:"発見する",comment:"※detective…探偵",deck:"04-2"},
+{id:208,word:"demonstrator",kana:"デモンストレイター",pos:"名",meaning:"デモ参加者",comment:"",deck:"04-2"},
+{id:209,word:"merchandise",kana:"マーチャンダイズ",pos:"名",meaning:"商品、【動】販売する",comment:"",deck:"04-2"},
+{id:210,word:"cancer",kana:"キャンサー",pos:"名",meaning:"蟹座、がん",comment:"",deck:"04-2"},
+{id:211,word:"estimate",kana:"エスティメイト",pos:"動",meaning:"見積もりをする、【名】見積もり",comment:"",deck:"04-2"},
+{id:212,word:"unknown",kana:"アンノウン",pos:"名",meaning:"未知、【形】未知の、不明の",comment:"",deck:"04-2"},
+{id:213,word:"nation",kana:"ネイション",pos:"名",meaning:"国、民族",comment:"",deck:"04-2"},
+{id:214,word:"green house effect",kana:"グリーン ハウス イフェクト",pos:"名",meaning:"温室効果",comment:"",deck:"04-2"},
+{id:215,word:"convince",kana:"コンビンス",pos:"動",meaning:"確認する",comment:"",deck:"04-2"},
+{id:216,word:"nutrient",kana:"ニュートリエント",pos:"名",meaning:"栄養",comment:"",deck:"04-2"},
+{id:217,word:"household income",kana:"ハウスホールド インカム",pos:"名",meaning:"世帯収入",comment:"",deck:"04-2"},
+{id:218,word:"general election",kana:"ジェネラル イレクション",pos:"名",meaning:"総選挙",comment:"",deck:"04-2"},
+{id:219,word:"asset",kana:"アセット",pos:"名",meaning:"資産",comment:"",deck:"04-2"},
+{id:220,word:"minus",kana:"マイナス",pos:"前",meaning:"引いた",comment:"",deck:"04-2"},
+{id:221,word:"sweep",kana:"スウィープ",pos:"動",meaning:"掃く",comment:"※拭くはwipe",deck:"04-2"},
+{id:222,word:"enter",kana:"エンター",pos:"動",meaning:"入る",comment:"",deck:"04-2"},
+{id:223,word:"side walk",kana:"サイドウォーク",pos:"名",meaning:"歩道",comment:"",deck:"04-2"},
+{id:224,word:"dine",kana:"ダイン",pos:"動",meaning:"食事を奢る",comment:"",deck:"04-2"},
+{id:225,word:"beverage",kana:"ベバレッジ",pos:"名",meaning:"飲料",comment:"",deck:"04-2"},
+{id:226,word:"stack",kana:"スタック",pos:"動",meaning:"積み上げる",comment:"",deck:"04-2"},
+{id:227,word:"drive back to",kana:"ドライブ バック トゥ",pos:"動",meaning:"車で戻る",comment:"",deck:"04-2"},
+{id:228,word:"Would you like to 〜？",kana:"ウッジュー ライク トゥ",pos:"",meaning:"〜したいですか？",comment:"",deck:"04-2"},
+{id:229,word:"helpful",kana:"ヘルプフル",pos:"形",meaning:"役に立つ",comment:"",deck:"04-2"},
+{id:230,word:"log",kana:"ログ",pos:"名",meaning:"丸太",comment:"",deck:"04-2"},
+{id:231,word:"along",kana:"アロング",pos:"前",meaning:"〜に沿って",comment:"",deck:"04-2"},
+{id:232,word:"along with",kana:"アロング ウィズ",pos:"",meaning:"一緒に",comment:"",deck:"04-2"},
+{id:233,word:"against",kana:"アゲインスト",pos:"前",meaning:"〜に寄りかかって、〜に反して",comment:"",deck:"04-2"},
+{id:234,word:"loan",kana:"ローン",pos:"名",meaning:"ローン、貸付",comment:"",deck:"04-2"},
+{id:235,word:"do laundry",kana:"ドゥ ランドリー",pos:"動",meaning:"洗濯をする",comment:"",deck:"04-2"},
+{id:236,word:"resume",kana:"レジュメ",pos:"名",meaning:"履歴書、レジュメ",comment:"",deck:"04-3"},
+{id:237,word:"aggressive",kana:"アグレッシブ",pos:"形",meaning:"積極的な、攻撃的な",comment:"",deck:"04-3"},
+{id:238,word:"light traffic",kana:"ライト トラフィック",pos:"形",meaning:"交通量の少ない",comment:"",deck:"04-3"},
+{id:239,word:"compete",kana:"コンピート",pos:"動",meaning:"争う、競う",comment:"",deck:"04-3"},
+{id:240,word:"advance",kana:"アドバンス",pos:"形",meaning:"In advanceで…前もって（0977）",comment:"",deck:"04-3"},
+{id:241,word:"automaker",kana:"オートメイカー",pos:"名",meaning:"自動車メーカー",comment:"",deck:"04-3"},
+{id:242,word:"rally",kana:"ラリー",pos:"名",meaning:"集会",comment:"",deck:"04-3"},
+{id:243,word:"campain",kana:"キャンペーン",pos:"名",meaning:"運動",comment:"",deck:"04-3"},
+{id:244,word:"strengthen",kana:"ストレングスン",pos:"動",meaning:"強くなる",comment:"",deck:"04-3"},
+{id:245,word:"does",kana:"ダズ",pos:"動",meaning:"やる、する",comment:"",deck:"04-3"},
+{id:246,word:"hesitate",kana:"ヘジテイト",pos:"動",meaning:"ためらう",comment:"ex. Don't hesitate to call me.",deck:"06-1"},
+{id:247,word:"stop by",kana:"ストップ バイ",pos:"",meaning:"〜に立ち寄る",comment:"",deck:"06-1"},
+{id:248,word:"fluent",kana:"フルーエント",pos:"形",meaning:"流暢な",comment:"",deck:"06-1"},
+{id:249,word:"shipment",kana:"シップメント",pos:"名",meaning:"積み荷",comment:"",deck:"06-1"},
+{id:250,word:"reject",kana:"リジェクト",pos:"動",meaning:"を断わる",comment:"",deck:"06-1"},
+{id:251,word:"commission",kana:"コミッション",pos:"名",meaning:"委員会、制作依頼、委任",comment:"",deck:"06-1"},
+{id:252,word:"mutually",kana:"ミューチュアリー",pos:"副",meaning:"相互に",comment:"",deck:"06-1"},
+{id:253,word:"violate",kana:"バイオレイト",pos:"動",meaning:"違反する、犯す",comment:"",deck:"06-1"},
+{id:254,word:"table",kana:"テーブル",pos:"名",meaning:"表，九九表",comment:"ex. Please refer to the table below.",deck:"06-1"},
+{id:255,word:"scenery",kana:"シーナリー",pos:"名",meaning:"景色",comment:"",deck:"06-1"},
+{id:256,word:"generous",kana:"ジェネラス",pos:"形",meaning:"気前のよい",comment:"",deck:"06-1"},
+{id:257,word:"make it to ~",kana:"メイク イット トゥ",pos:"",meaning:"～に間に合う",comment:"",deck:"06-1"},
+{id:258,word:"upward",kana:"アップワード",pos:"形",meaning:"上向きの【副】上へ",comment:"",deck:"06-1"},
+{id:259,word:"throughout",kana:"スルーアウト",pos:"前",meaning:"〜中、〜の至るところに",comment:"",deck:"06-1"},
+{id:260,word:"accommodation",kana:"アコモデーション",pos:"名",meaning:"宿泊施設",comment:"",deck:"06-1"},
+{id:261,word:"reliable",kana:"リライアブル",pos:"形",meaning:"頼もしい、頼りになる",comment:"",deck:"06-1"},
+{id:262,word:"brisk",kana:"ブリスク",pos:"形",meaning:"活発な",comment:"",deck:"06-1"},
+{id:263,word:"extensive",kana:"エクステンシブ",pos:"形",meaning:"広大な",comment:"",deck:"06-1"},
+{id:264,word:"declaration",kana:"デクラレーション",pos:"名",meaning:"宣言",comment:"",deck:"06-1"},
+{id:265,word:"assignment",kana:"アサインメント",pos:"名",meaning:"課題、任務",comment:"",deck:"06-1"},
+{id:266,word:"auditor",kana:"オーディター",pos:"名",meaning:"監査役",comment:"",deck:"06-1"},
+{id:267,word:"reimbursement",kana:"リインバースメント",pos:"名",meaning:"払い戻し",comment:"",deck:"06-1"},
+{id:268,word:"stare",kana:"ステア",pos:"動",meaning:"じっと見る、じろじろ見る",comment:"",deck:"06-1"},
+{id:269,word:"nearly",kana:"ニアリー",pos:"副",meaning:"ほとんど、もう少しで",comment:"",deck:"06-1"},
+{id:270,word:"cure",kana:"キュア",pos:"動",meaning:"治療する",comment:"",deck:"06-1"},
+{id:271,word:"unless",kana:"アンレス",pos:"",meaning:"〜でないかぎり",comment:"",deck:"06-1"},
+{id:272,word:"be loaded with ~",kana:"ビー ローデッド ウィズ",pos:"",meaning:"〜が大量にある",comment:"",deck:"06-1"},
+{id:273,word:"not until",kana:"ノット アンティル",pos:"",meaning:"〜して初めて…する",comment:"",deck:"06-1"},
+{id:274,word:"thesis",kana:"シーシス",pos:"名",meaning:"論文",comment:"",deck:"06-1"},
+{id:275,word:"Implement",kana:"インプリメント",pos:"動",meaning:"実行する",comment:"",deck:"06-1"},
+{id:276,word:"remarkably",kana:"リマーカブリー",pos:"副",meaning:"非常に",comment:"",deck:"06-1"},
+{id:277,word:"not until ~",kana:"ノット アンティル",pos:"",meaning:"～までは…ない",comment:"",deck:"06-1"},
+{id:278,word:"significantly",kana:"シグニフィカントリー",pos:"副",meaning:"重大に",comment:"",deck:"06-1"},
+{id:279,word:"consumption",kana:"コンサンプション",pos:"名",meaning:"消費、消費量",comment:"",deck:"06-1"},
+{id:280,word:"clarity",kana:"クラリティー",pos:"名",meaning:"明らかにする",comment:"",deck:"06-1"},
+{id:281,word:"definitely",kana:"デフィニットリー",pos:"副",meaning:"絶対に、きっと、間違いなく",comment:"",deck:"06-1"},
+{id:282,word:"throat",kana:"スロート",pos:"名",meaning:"喉（のど）",comment:"ex. sore throat",deck:"06-1"},
+{id:283,word:"issue",kana:"イシュー",pos:"動",meaning:"出版する、発行する",comment:"",deck:"06-1"},
+{id:284,word:"back to back",kana:"バック トゥ バック",pos:"",meaning:"立て続けに",comment:"",deck:"06-1"},
+{id:285,word:"depart",kana:"ディパート",pos:"動",meaning:"出発する",comment:"※departure…出発 ⇔ arrival…到着",deck:"06-2"},
+{id:286,word:"crack",kana:"クラック",pos:"名",meaning:"割れ目、ひび、亀裂",comment:"",deck:"06-2"},
+{id:287,word:"extensive",kana:"エクステンシブ",pos:"形",meaning:"広範囲の",comment:"",deck:"06-2"},
+{id:288,word:"recession",kana:"リセッション",pos:"名",meaning:"不況",comment:"",deck:"06-2"},
+{id:289,word:"run into",kana:"ラン イントゥ",pos:"",meaning:"～に遭遇する",comment:"",deck:"06-2"},
+{id:290,word:"nevertheless",kana:"ネバーザレス",pos:"副",meaning:"それにも関わらず",comment:"",deck:"06-2"},
+{id:291,word:"commit",kana:"コミット",pos:"動",meaning:"委託する、約束する、専心する",comment:"",deck:"06-2"},
+{id:292,word:"eventually",kana:"イベンチュアリー",pos:"副",meaning:"結局、ついに",comment:"",deck:"06-2"},
+{id:293,word:"preferable",kana:"プレファラブル",pos:"形",meaning:"好ましい",comment:"",deck:"06-2"},
+{id:294,word:"inaccurate",kana:"イナキュレイト",pos:"形",meaning:"不正確な、ずさんな、誤った",comment:"",deck:"06-2"},
+{id:295,word:"upon",kana:"アポン",pos:"前",meaning:"〜するとすぐに",comment:"",deck:"06-2"},
+{id:296,word:"investigate",kana:"インベスティゲイト",pos:"動",meaning:"調査する",comment:"",deck:"06-2"},
+{id:297,word:"discrimination",kana:"ディスクリミネーション",pos:"",meaning:"差別・区別",comment:"",deck:"06-2"},
+{id:298,word:"closely",kana:"クロウスリー",pos:"副",meaning:"密接に、綿密に",comment:"",deck:"06-2"},
+{id:299,word:"perspective",kana:"パースペクティブ",pos:"名",meaning:"視点",comment:"",deck:"06-2"},
+{id:300,word:"mean",kana:"ミーン",pos:"動",meaning:"引き起こす（意味する、意地悪な）",comment:"",deck:"06-2"},
+{id:301,word:"courteous",kana:"カーティアス",pos:"形",meaning:"礼儀正しい、丁寧な",comment:"",deck:"06-2"},
+{id:302,word:"impressive",kana:"インプレッシブ",pos:"形",meaning:"感動的な、心を打つ、印象的な",comment:"",deck:"06-2"},
+{id:303,word:"totally",kana:"トータリー",pos:"副",meaning:"完全に",comment:"",deck:"06-2"},
+{id:304,word:"completion",kana:"コンプリーション",pos:"名",meaning:"完成",comment:"",deck:"06-2"},
+{id:305,word:"run for",kana:"ラン フォー",pos:"動",meaning:"立候補する、出馬する",comment:"",deck:"06-2"},
+{id:306,word:"calculation",kana:"キャルキュレーション",pos:"名",meaning:"計算、見積もり",comment:"",deck:"06-2"},
+{id:307,word:"intensive",kana:"インテンシブ",pos:"形",meaning:"集中的な",comment:"",deck:"06-2"},
+{id:308,word:"halt",kana:"ホルト",pos:"動",meaning:"停止する、止める",comment:"",deck:"06-2"},
+{id:309,word:"thoughtful",kana:"ソートフル",pos:"形",meaning:"思いやりのある",comment:"",deck:"06-2"},
+{id:310,word:"inventory",kana:"インベントリー",pos:"名",meaning:"在庫",comment:"※leftover…残り物",deck:"06-2"},
+{id:311,word:"eligible",kana:"エリジブル",pos:"形",meaning:"適格である、ふさわしい",comment:"",deck:"06-2"},
+{id:312,word:"Culinary",kana:"キュリナリー",pos:"形",meaning:"料理の、台所の",comment:"",deck:"06-2"},
+{id:313,word:"artificial",kana:"アーティフィシャル",pos:"形",meaning:"人工的な",comment:"",deck:"06-2"},
+{id:314,word:"retail",kana:"リーテイル",pos:"名",meaning:"小売り",comment:"",deck:"06-2"},
+{id:315,word:"temperature",kana:"テンパラチャー",pos:"形",meaning:"温暖な",comment:"",deck:"06-2"},
+{id:316,word:"stark",kana:"スターク",pos:"形",meaning:"完全な、純然たる",comment:"",deck:"06-2"},
+{id:317,word:"consult",kana:"コンサルト",pos:"",meaning:"相談する",comment:"",deck:"06-2"},
+{id:318,word:"sculpture",kana:"スカルプチャー",pos:"名",meaning:"彫刻",comment:"",deck:"06-2"},
+{id:319,word:"submission",kana:"サブミッション",pos:"名",meaning:"提出",comment:"",deck:"06-2"},
+{id:320,word:"shrine",kana:"シュライン",pos:"名",meaning:"神社",comment:"",deck:"06-2"},
+{id:321,word:"facilitate",kana:"ファシリテイト",pos:"動",meaning:"用意にする",comment:"※facility…施設 ※faculty…学部",deck:"07-1"},
+{id:322,word:"ingedient",kana:"イングリーディエント",pos:"名",meaning:"材料（≒material）",comment:"",deck:"07-1"},
+{id:323,word:"acquisition",kana:"アクイジション",pos:"名",meaning:"取得、獲得",comment:"",deck:"07-1"},
+{id:324,word:"captivate",kana:"キャプティベイト",pos:"動",meaning:"魅惑する、うっとりさせる",comment:"",deck:"07-1"},
+{id:325,word:"captivating",kana:"キャプティベイティング",pos:"形",meaning:"魅惑的な",comment:"",deck:"07-1"},
+{id:326,word:"be sure about 〜",kana:"ビー シュア アバウト",pos:"",meaning:"〜について確信がない",comment:"",deck:"07-1"},
+{id:327,word:"contractor",kana:"コントラクター",pos:"名",meaning:"請負業者",comment:"",deck:"07-1"},
+{id:328,word:"therefore",kana:"ゼアフォー",pos:"副",meaning:"それゆえ",comment:"",deck:"07-1"},
+{id:329,word:"ordinance",kana:"オーディナンス",pos:"名",meaning:"法令、条例",comment:"",deck:"07-1"},
+{id:330,word:"take effect",kana:"テイク イフェクト",pos:"動",meaning:"（法律や薬などが）効力を発揮する",comment:"",deck:"07-1"},
+{id:331,word:"council",kana:"カウンシル",pos:"名",meaning:"議会",comment:"",deck:"07-1"},
+{id:332,word:"head（動）",kana:"ヘッド",pos:"動",meaning:"率いる、先頭に立つ（0569）",comment:"",deck:"07-1"},
+{id:333,word:"utilize",kana:"ユーティライズ",pos:"動",meaning:"役に立たせる、利用する",comment:"",deck:"07-1"},
+{id:334,word:"I'm not sure〜",kana:"アイム ノット シュア",pos:"",meaning:"〜かどうか、よくわかりませんが",comment:"",deck:"07-1"},
+{id:335,word:"I'm sure 〜",kana:"アイム シュア",pos:"",meaning:"きっと〜に違いない",comment:"",deck:"07-1"},
+{id:336,word:"extend（2つの意味）",kana:"エクステンド",pos:"動",meaning:"伸ばす、拡大する、拡張する",comment:"",deck:"07-1"},
+{id:337,word:"even more",kana:"イーブン モア",pos:"",meaning:"さらに",comment:"",deck:"07-1"},
+{id:338,word:"whole",kana:"ホール",pos:"形",meaning:"全体の、すべての",comment:"",deck:"07-1"},
+{id:339,word:"while",kana:"ワイル",pos:"接",meaning:"〜の間",comment:"",deck:"07-1"},
+{id:340,word:"make progress",kana:"メイク プログレス",pos:"",meaning:"進歩する",comment:"",deck:"07-1"},
+{id:341,word:"at one's best",kana:"アット ワンズ ベスト",pos:"",meaning:"（それの）最高の状態で",comment:"",deck:"07-1"},
+{id:342,word:"interaction（２つの意味）",kana:"インタラクション",pos:"名",meaning:"交流、相互作用",comment:"",deck:"07-1"},
+{id:343,word:"personable",kana:"パーソナブル",pos:"形",meaning:"個性的な",comment:"",deck:"07-1"},
+{id:344,word:"adress（動）",kana:"アドレス",pos:"動",meaning:"演説する、話しかける、（課題に）取り組む",comment:"",deck:"07-1"},
+{id:345,word:"assenble",kana:"アセンブル",pos:"動",meaning:"組み立てる",comment:"",deck:"07-1"},
+{id:346,word:"incorporate〜into",kana:"インコーポレイト イントゥ",pos:"動",meaning:"〜を…に取り入れる",comment:"",deck:"07-1"},
+{id:347,word:"spin",kana:"スピン",pos:"動",meaning:"（物語を糸を紡ぐように）展開する",comment:"",deck:"07-1"},
+{id:348,word:"tale",kana:"テイル",pos:"名",meaning:"物語",comment:"",deck:"07-1"},
+{id:349,word:"pass down〜",kana:"パス ダウン",pos:"動",meaning:"世代を超えて語り継ぐ",comment:"",deck:"07-1"},
+{id:350,word:"come alive",kana:"カム アライブ",pos:"",meaning:"生き生きと、活気づいた",comment:"",deck:"07-1"},
+{id:351,word:"exceed",kana:"エクシード",pos:"動",meaning:"期待（予想）を超える",comment:"",deck:"07-1"},
+{id:352,word:"faulty",kana:"フォルティー",pos:"形",meaning:"欠陥のある",comment:"",deck:"07-1"},
+{id:353,word:"discontinue",kana:"ディスコンティニュー",pos:"動",meaning:"生産を中止する",comment:"",deck:"07-1"},
+{id:354,word:"take place",kana:"テイク プレイス",pos:"動",meaning:"開催する、開かれる",comment:"",deck:"07-1"},
+{id:355,word:"take the place of",kana:"テイク ザ プレイス オブ",pos:"",meaning:"取って代わる",comment:"",deck:"07-1"},
+{id:356,word:"shop（動）",kana:"ショップ",pos:"動",meaning:"買い物する",comment:"",deck:"07-1"},
+{id:357,word:"procedure",kana:"プロシージャー",pos:"名",meaning:"手順",comment:"",deck:"07-1"},
+{id:358,word:"go out",kana:"ゴー アウト",pos:"動",meaning:"発信される",comment:"",deck:"07-1"},
+{id:359,word:"make sure that 〜",kana:"メイク シュア ザット",pos:"",meaning:"必ず〜を行ってください",comment:"",deck:"07-1"},
+{id:360,word:"certainly",kana:"サートゥンリー",pos:"副",meaning:"確かに。承知しました。",comment:"",deck:"07-1"},
+{id:361,word:"greetings",kana:"グリーティングズ",pos:"",meaning:"ご挨拶申し上げます。",comment:"",deck:"07-2"},
+{id:362,word:"anyhow",kana:"エニーハウ",pos:"副",meaning:"まあ、とにかく",comment:"",deck:"07-2"},
+{id:363,word:"specification",kana:"スペシフィケーション",pos:"名",meaning:"明細書、仕様書",comment:"",deck:"07-2"},
+{id:364,word:"specifically",kana:"スペシフィカリー",pos:"副",meaning:"具体的に",comment:"",deck:"07-2"},
+{id:365,word:"surgical",kana:"サージカル",pos:"形",meaning:"外科用の、外科の",comment:"",deck:"07-2"},
+{id:366,word:"professional reference",kana:"プロフェッショナル レファレンス",pos:"名",meaning:"（仕事や実績の評価を聞ける）参照相手",comment:"",deck:"07-2"},
+{id:367,word:"reserve A for B",kana:"リザーブ エー フォー ビー",pos:"",meaning:"AをBのために取っておく",comment:"",deck:"07-2"},
+{id:368,word:"municipal",kana:"ミュニシパル",pos:"形",meaning:"市営の、地方自治体の",comment:"",deck:"07-2"},
+{id:369,word:"two away",kana:"トウ アウェイ",pos:"名",meaning:"駐車違反のレッカー撤去",comment:"",deck:"07-2"},
+{id:370,word:"state（動）",kana:"ステイト",pos:"動",meaning:"明言する（0214）",comment:"",deck:"07-2"},
+{id:371,word:"confirmation",kana:"コンファメーション",pos:"名",meaning:"確認",comment:"",deck:"07-2"},
+{id:372,word:"concession  stand",kana:"コンセッション スタンド",pos:"名",meaning:"（イベント会場の）売店",comment:"",deck:"07-2"},
+{id:373,word:"direct traffic",kana:"ダイレクト トラフィック",pos:"名",meaning:"交通整理",comment:"",deck:"07-2"},
+{id:374,word:"attendees",kana:"アテンディーズ",pos:"名",meaning:"参加者",comment:"≒participants",deck:"07-2"},
+{id:375,word:"destinations",kana:"デスティネーションズ",pos:"名",meaning:"目的地",comment:"",deck:"07-2"},
+{id:376,word:"most likely",kana:"モスト ライクリー",pos:"",meaning:"最も可能性の高い",comment:"",deck:"07-2"},
+{id:377,word:"receipts",kana:"リシーツ",pos:"名",meaning:"領収書",comment:"",deck:"07-2"},
+{id:378,word:"transaction",kana:"トランザクション",pos:"名",meaning:"取引、処理（トランザクション）",comment:"",deck:"07-2"},
+{id:379,word:"indicate",kana:"インディケイト",pos:"動",meaning:"表す、示す",comment:"",deck:"07-2"},
+{id:380,word:"server（PC用語じゃない）",kana:"サーバー",pos:"名",meaning:"給仕人",comment:"",deck:"07-2"},
+{id:381,word:"accommodate",kana:"アコモデイト",pos:"動",meaning:"調整させる、適応させる、融通させる",comment:"",deck:"07-2"},
+{id:382,word:"representative",kana:"レプリゼンタティブ",pos:"名",meaning:"代表者、代表人",comment:"",deck:"07-2"},
+{id:383,word:"fiscal year",kana:"フィスカル イヤー",pos:"名",meaning:"会計年度（北米では10/1〜9/30）",comment:"",deck:"07-2"},
+{id:384,word:"maerger",kana:"マージャー",pos:"名",meaning:"（会社や事業の）合併",comment:"",deck:"07-2"},
+{id:385,word:"normally",kana:"ノーマリー",pos:"副",meaning:"通常は、普段は",comment:"",deck:"07-2"},
+{id:386,word:"let A know",kana:"レット エー ノウ",pos:"",meaning:"Aに伝えてください",comment:"",deck:"07-2"},
+{id:387,word:"transit",kana:"トランジット",pos:"名",meaning:"乗り継ぎ、通行、通過",comment:"",deck:"07-2"},
+{id:388,word:"pedestrian",kana:"ペデストリアン",pos:"名",meaning:"歩行者、競歩者",comment:"",deck:"07-2"},
+{id:389,word:"alongside",kana:"アロングサイド",pos:"副",meaning:"一緒に並んで",comment:"",deck:"07-2"},
+{id:390,word:"forthcoming",kana:"フォースカミング",pos:"形",meaning:"今度の、やがて来る",comment:"≒upcoming",deck:"07-2"},
+{id:391,word:"load（名詞）",kana:"ロード",pos:"名",meaning:"積荷",comment:"",deck:"07-2"},
+{id:392,word:"receiving",kana:"リシービング",pos:"名",meaning:"荷受け部門",comment:"",deck:"07-2"},
+{id:393,word:"rack",kana:"ラック",pos:"名",meaning:"ラック、置き棚",comment:"※lack…不足",deck:"07-2"},
+{id:394,word:"shipment",kana:"シップメント",pos:"名",meaning:"積荷、発送した荷物",comment:"",deck:"07-2"},
+{id:395,word:"dairy",kana:"デアリー",pos:"形",meaning:"乳製品の、【名】酪農場",comment:"※daily…日々の、毎日の",deck:"07-2"},
+{id:396,word:"vendor",kana:"ベンダー",pos:"名",meaning:"販売業者、ベンダー",comment:"",deck:"07-2"},
+{id:397,word:"thoug",kana:"ゾウ",pos:"接",meaning:"だけれども",comment:"≒although",deck:"07-2"},
+{id:398,word:"appreciation",kana:"アプリシエーション",pos:"名",meaning:"感謝",comment:"",deck:"07-2"},
+{id:399,word:"participants",kana:"パーティシパンツ",pos:"名",meaning:"参加者",comment:"≒attendees",deck:"07-2"},
+{id:400,word:"aloud",kana:"アラウド",pos:"副",meaning:"声に出して",comment:"",deck:"07-2"},
+{id:401,word:"either of 〜",kana:"イーザー オブ",pos:"",meaning:"〜のうちどちらか",comment:"",deck:"07-3"},
+{id:402,word:"either of you",kana:"イーザー オブ ユー",pos:"",meaning:"あなたたちのどちらか",comment:"",deck:"07-3"},
+{id:403,word:"construction",kana:"コンストラクション",pos:"名",meaning:"建築、工事",comment:"",deck:"07-3"},
+{id:404,word:"artchitect",kana:"アーキテクト",pos:"名",meaning:"建築家",comment:"",deck:"07-3"},
+{id:405,word:"artchitecture",kana:"アーキテクチャー",pos:"名",meaning:"建築、構造物",comment:"",deck:"07-3"},
+{id:406,word:"relevant",kana:"レレバント",pos:"形",meaning:"関連した、適切な（0804）",comment:"",deck:"07-3"},
+{id:407,word:"right on time",kana:"ライト オン タイム",pos:"",meaning:"時間ぴったり",comment:"",deck:"07-3"},
+{id:408,word:"washing machine",kana:"ウォッシング マシーン",pos:"名",meaning:"洗濯機",comment:"≒washer",deck:"07-3"},
+{id:409,word:"laundromat",kana:"ランドロマット",pos:"名",meaning:"コインランドリー",comment:"",deck:"07-3"},
+{id:410,word:"inspector",kana:"インスペクター",pos:"名",meaning:"検査官",comment:"",deck:"07-3"},
+{id:411,word:"enhance",kana:"エンハンス",pos:"動",meaning:"さらに強化する（エンハンス）",comment:"",deck:"07-3"},
+{id:412,word:"contribution",kana:"コントリビューション",pos:"名",meaning:"貢献",comment:"",deck:"07-3"},
+{id:413,word:"shareholder",kana:"シェアホルダー",pos:"名",meaning:"株主",comment:"",deck:"07-3"},
+{id:414,word:"therapist",kana:"セラピスト",pos:"名",meaning:"療法士",comment:"",deck:"07-3"},
+{id:415,word:"back（体の）",kana:"バック",pos:"名",meaning:"背中",comment:"",deck:"07-3"},
+{id:416,word:"thread",kana:"スレッド",pos:"名",meaning:"糸、話の脈絡",comment:"",deck:"08-1"},
+{id:417,word:"belongings",kana:"ビロンギングズ",pos:"名",meaning:"所有品",comment:"",deck:"08-1"},
+{id:418,word:"proceed",kana:"プロシード",pos:"動",meaning:"進行する",comment:"",deck:"08-1"},
+{id:419,word:"perishable",kana:"ペリシャブル",pos:"形",meaning:"腐りやすい",comment:"",deck:"08-1"},
+{id:420,word:"fullfill",kana:"フルフィル",pos:"動",meaning:"（必要要件を）満たす",comment:"",deck:"08-1"},
+{id:421,word:"as thought",kana:"アズ ゾウ",pos:"",meaning:"まるで〜かのように",comment:"",deck:"08-1"},
+{id:422,word:"aesthetic",kana:"エスセティック",pos:"形",meaning:"美的感覚のある、【名】美学",comment:"",deck:"08-1"},
+{id:423,word:"availability",kana:"アベイラビリティー",pos:"名",meaning:"都合、可用性",comment:"",deck:"08-1"},
+{id:424,word:"inspection",kana:"インスペクション",pos:"名",meaning:"検査",comment:"",deck:"08-1"},
+{id:425,word:"retreat",kana:"リトリート",pos:"名",meaning:"研修会、研修旅行",comment:"",deck:"08-1"},
+{id:426,word:"retrieve",kana:"リトリーブ",pos:"動",meaning:"回収する",comment:"",deck:"08-1"},
+{id:427,word:"feature",kana:"フィーチャー",pos:"名",meaning:"特徴",comment:"",deck:"08-1"},
+{id:428,word:"predict",kana:"プリディクト",pos:"動",meaning:"予測する",comment:"",deck:"08-1"},
+{id:429,word:"anticipate",kana:"アンティシペイト",pos:"動",meaning:"予期する",comment:"",deck:"08-1"},
+{id:430,word:"determine",kana:"ディターミン",pos:"動",meaning:"明らかにする（0242）",comment:"",deck:"08-1"},
+{id:431,word:"indicate",kana:"インディケイト",pos:"動",meaning:"示す、表す",comment:"",deck:"08-1"},
+{id:432,word:"note that",kana:"ノート ザット",pos:"",meaning:"〜と述べる",comment:"",deck:"08-1"},
+{id:433,word:"excerpt",kana:"エクサープト",pos:"名",meaning:"抜粋",comment:"",deck:"08-1"},
+{id:434,word:"chef",kana:"シェフ",pos:"名",meaning:"シェフ",comment:"※チーフはChiefで「i」が入る",deck:"08-1"},
+{id:435,word:"chief",kana:"チーフ",pos:"名",meaning:"チーフ",comment:"※シェフはChefで「i」が入らない",deck:"08-1"},
+{id:436,word:"imply",kana:"インプライ",pos:"動",meaning:"暗に意味する",comment:"",deck:"08-1"},
+{id:437,word:"script",kana:"スクリプト",pos:"名",meaning:"台本、脚本",comment:"",deck:"08-1"},
+{id:438,word:"incorrect",kana:"インコレクト",pos:"形",meaning:"不正確な、誤った",comment:"",deck:"08-1"},
+{id:439,word:"correct",kana:"コレクト",pos:"形",meaning:"正しい、正確な",comment:"",deck:"08-1"},
+{id:440,word:"existing",kana:"イグジスティング",pos:"形",meaning:"既存の、現在の",comment:"",deck:"08-1"},
+{id:441,word:"lumber",kana:"ランバー",pos:"名",meaning:"木材",comment:"",deck:"08-1"},
+{id:442,word:"quite a bit",kana:"クワイト ア ビット",pos:"形",meaning:"かなりたくさんの",comment:"",deck:"08-1"},
+{id:443,word:"move in",kana:"ムーブ イン",pos:"動",meaning:"引っ越してくる、入居する",comment:"",deck:"08-1"},
+{id:444,word:"reassure",kana:"リアシュア",pos:"動",meaning:"安心させる、不安をなくす",comment:"",deck:"08-1"},
+{id:445,word:"affect",kana:"アフェクト",pos:"動",meaning:"影響を及ぼす、作用する",comment:"",deck:"08-1"},
+{id:446,word:"patron",kana:"ペイトロン",pos:"名",meaning:"贔屓客、後援者",comment:"",deck:"08-1"},
+{id:447,word:"fund - raising",kana:"ファンド レイジング",pos:"名",meaning:"募金",comment:"",deck:"08-1"},
+{id:448,word:"incoming",kana:"インカミング",pos:"形",meaning:"新任の、次に来る",comment:"",deck:"08-1"},
+{id:449,word:"faithfully",kana:"フェイスフリー",pos:"副",meaning:"忠実に、誠実に",comment:"",deck:"08-1"},
+{id:450,word:"remark",kana:"リマーク",pos:"名",meaning:"意見、【動】意見を言う",comment:"",deck:"08-1"},
+{id:451,word:"serve as a manager",kana:"サーブ アズ ア マネージャー",pos:"",meaning:"マネージャーとして貢献する",comment:"",deck:"08-1"},
+{id:452,word:"tword",kana:"トワード",pos:"前",meaning:"〜に向かって",comment:"",deck:"08-1"},
+{id:453,word:"register",kana:"レジスター",pos:"名",meaning:"登録、【動】登録する",comment:"",deck:"08-1"},
+{id:454,word:"brand new",kana:"ブランド ニュー",pos:"形",meaning:"真新しい",comment:"",deck:"08-1"},
+{id:455,word:"multiple",kana:"マルティプル",pos:"形",meaning:"多様な、多数の",comment:"",deck:"08-1"},
+{id:456,word:"prompt",kana:"プロンプト",pos:"動",meaning:"入力を求める",comment:"",deck:"08-2"},
+{id:457,word:"suite",kana:"スイート",pos:"名",meaning:"オフィス区画、部屋番号、スイートルーム",comment:"",deck:"08-2"},
+{id:458,word:"directory",kana:"ディレクトリー",pos:"名",meaning:"案内板、一覧表示（PCフォルダの）",comment:"",deck:"08-2"},
+{id:459,word:"identification",kana:"アイデンティフィケーション",pos:"名",meaning:"身分証明書",comment:"",deck:"08-2"},
+{id:460,word:"get in someone's way",kana:"ゲット イン サムワンズ ウェイ",pos:"動",meaning:"邪魔をする",comment:"",deck:"08-2"},
+{id:461,word:"extinguisher",kana:"エクスティングイッシャー",pos:"名",meaning:"消化器",comment:"",deck:"08-2"},
+{id:462,word:"detector",kana:"ディテクター",pos:"名",meaning:"検出器",comment:"",deck:"08-2"},
+{id:463,word:"property owner",kana:"プロパティー オーナー",pos:"名",meaning:"不動産オーナー",comment:"",deck:"08-2"},
+{id:464,word:"leftover",kana:"レフトオーバー",pos:"名",meaning:"残り物",comment:"",deck:"08-2"},
+{id:465,word:"text",kana:"テキスト",pos:"動",meaning:"メッセージを送る",comment:"",deck:"08-2"},
+{id:466,word:"I'm sure 〜",kana:"アイム シュア",pos:"",meaning:"きっと〜に違いない",comment:"",deck:"08-2"},
+{id:467,word:"fabric",kana:"ファブリック",pos:"名",meaning:"布、織物",comment:"",deck:"08-2"},
+{id:468,word:"bolster",kana:"ボルスター",pos:"動",meaning:"補強する",comment:"",deck:"08-2"},
+{id:469,word:"array",kana:"アレイ",pos:"名",meaning:"整列したもの",comment:"",deck:"08-2"},
+{id:470,word:"takeover",kana:"テイクオーバー",pos:"名",meaning:"買収、乗っ取り",comment:"",deck:"08-2"},
+{id:471,word:"region",kana:"リージョン",pos:"名",meaning:"地域",comment:"",deck:"08-2"},
+{id:472,word:"cozy",kana:"コウジー",pos:"形",meaning:"居心地のいい",comment:"",deck:"08-2"},
+{id:473,word:"resident",kana:"レジデント",pos:"名",meaning:"住人",comment:"",deck:"08-2"},
+{id:474,word:"installation",kana:"インストレーション",pos:"名",meaning:"設置・就任",comment:"",deck:"08-2"},
+{id:475,word:"then",kana:"ゼン",pos:"副",meaning:"それから",comment:"",deck:"08-2"},
+{id:476,word:"assessment",kana:"アセスメント",pos:"名",meaning:"評価、査定",comment:"",deck:"08-2"},
+{id:477,word:"pit",kana:"ピット",pos:"名",meaning:"鉱山、採掘所",comment:"",deck:"08-2"},
+{id:478,word:"gravel",kana:"グラベル",pos:"名",meaning:"砂利",comment:"",deck:"08-2"},
+{id:479,word:"pose a risk to 〜",kana:"ポーズ ア リスク トゥ",pos:"",meaning:"〜に対して危険をもたらす",comment:"",deck:"08-2"},
+{id:480,word:"invoice",kana:"インボイス",pos:"名",meaning:"請求書",comment:"",deck:"08-2"},
+{id:481,word:"specifically",kana:"スペシフィカリー",pos:"副",meaning:"具体的には",comment:"",deck:"08-2"},
+{id:482,word:"show up",kana:"ショー アップ",pos:"",meaning:"はっきり見える、現れる",comment:"",deck:"08-2"},
+{id:483,word:"lease",kana:"リース",pos:"名",meaning:"賃貸契約",comment:"",deck:"08-2"},
+{id:484,word:"direct a play",kana:"ダイレクト ア プレイ",pos:"",meaning:"劇を演出する",comment:"",deck:"08-2"},
+{id:485,word:"reproduce",kana:"リプロデュース",pos:"動",meaning:"複製する",comment:"",deck:"08-2"},
+{id:486,word:"staple",kana:"ステイプル",pos:"名",meaning:"ホチキス",comment:"",deck:"08-2"},
+{id:487,word:"fill out",kana:"フィル アウト",pos:"動",meaning:"記入する",comment:"",deck:"08-2"},
+{id:488,word:"form",kana:"フォーム",pos:"名",meaning:"用紙",comment:"",deck:"08-2"},
+{id:489,word:"full fill",kana:"フルフィル",pos:"動",meaning:"満たす",comment:"",deck:"08-2"},
+{id:490,word:"lemon",kana:"レモン",pos:"名",meaning:"レモン",comment:"※発音が「ラメン」",deck:"08-2"},
+{id:491,word:"pine",kana:"パイン",pos:"名",meaning:"松",comment:"",deck:"08-2"},
+{id:492,word:"until",kana:"アンティル",pos:"前",meaning:"〜まで（ずっと）",comment:"",deck:"08-2"},
+{id:493,word:"not untill tomorrow",kana:"ノット アンティル トゥモロウ",pos:"",meaning:"明日まで〜しない",comment:"",deck:"08-2"},
+{id:494,word:"accounting",kana:"アカウンティング",pos:"名",meaning:"会計",comment:"",deck:"08-2"},
+{id:495,word:"a range of 〜",kana:"ア レンジ オブ",pos:"",meaning:"広範囲の、様々な",comment:"",deck:"08-2"},
+{id:496,word:"offer（動詞で、申し出る、提供する以外の意味）",kana:"オファー",pos:"動",meaning:"提供する、披露する",comment:"",deck:"08-3"},
+{id:497,word:"produce（名詞）",kana:"プロデュース",pos:"名",meaning:"農作物（0033）",comment:"",deck:"08-3"},
+{id:498,word:"initiative",kana:"イニシアティブ",pos:"名",meaning:"構想",comment:"",deck:"08-3"},
+{id:499,word:"initiate",kana:"イニシエイト",pos:"動",meaning:"開始する",comment:"",deck:"08-3"},
+{id:500,word:"throughout",kana:"スルーアウト",pos:"前",meaning:"〜を通じて",comment:"",deck:"08-3"},
+{id:501,word:"ssiftly",kana:"スウィフトリー",pos:"副",meaning:"迅速に",comment:"",deck:"08-3"},
+{id:502,word:"sign",kana:"サイン",pos:"名",meaning:"掲示物、看板、（署名）",comment:"",deck:"09-1"},
+{id:503,word:"entitle",kana:"エンタイトル",pos:"動",meaning:"資格を与える",comment:"",deck:"09-1"},
+{id:504,word:"confer",kana:"コンファー",pos:"動",meaning:"与える、授与する",comment:"※conference（会議）",deck:"09-1"},
+{id:505,word:"What are the date of the job fair?",kana:"ワット アー ザ デイト オブ ザ ジョブ フェア",pos:"",meaning:"就職説明会の日程はいつですか？",comment:"",deck:"09-1"},
+{id:506,word:"well ahead of schedule",kana:"ウェル アヘッド オブ スケジュール",pos:"",meaning:"予定よりずっと早く",comment:"",deck:"09-1"},
+{id:507,word:"point of contact",kana:"ポイント オブ コンタクト",pos:"",meaning:"窓口、接点",comment:"",deck:"09-1"},
+{id:508,word:"as you can see",kana:"アズ ユー キャン シー",pos:"",meaning:"ご覧の通り、見て分かる通り",comment:"",deck:"09-1"},
+{id:509,word:"lead",kana:"リード",pos:"名",meaning:"責任者、リーダー、担当者",comment:"",deck:"09-1"},
+{id:510,word:"convention",kana:"コンベンション",pos:"名",meaning:"大会、代表者会議",comment:"",deck:"09-1"},
+{id:511,word:"Vietnamese",kana:"ベトナミーズ",pos:"形",meaning:"ベトナムの",comment:"",deck:"09-1"},
+{id:512,word:"venue",kana:"ベニュー",pos:"名",meaning:"会場、場所、開催地",comment:"",deck:"09-1"},
+{id:513,word:"encourage",kana:"エンカレッジ",pos:"動",meaning:"励ます、勇気づける、後押しする",comment:"",deck:"09-1"},
+{id:514,word:"oriented",kana:"オリエンティッド",pos:"形",meaning:"〜志向の、〜重視の",comment:"",deck:"09-1"},
+{id:515,word:"take advantage of",kana:"テイク アドバンテージ オブ",pos:"",meaning:"機会を生かす、弱みにつけこむ",comment:"",deck:"09-1"},
+{id:516,word:"be responsible for",kana:"ビー レスポンシブル フォー",pos:"",meaning:"〜に対して責任がある、〜を担当する",comment:"",deck:"09-1"},
+{id:517,word:"even though",kana:"イーブン ゾウ",pos:"接",meaning:"〜だけれども",comment:"",deck:"09-1"},
+{id:518,word:"deposit",kana:"ディポジット",pos:"動",meaning:"堆積する、預ける、置く",comment:"",deck:"09-1"},
+{id:519,word:"with venues across",kana:"ウィズ ベニューズ アクロス",pos:"",meaning:"〜全域に施設を展開している",comment:"",deck:"09-1"},
+{id:520,word:"setting",kana:"セッティング",pos:"名",meaning:"環境",comment:"",deck:"09-1"},
+{id:521,word:"nevertheless",kana:"ネバーザレス",pos:"副",meaning:"それにも関わらず",comment:"",deck:"09-1"},
+{id:522,word:"embezzle",kana:"エンベズル",pos:"動",meaning:"使い込む",comment:"",deck:"09-1"},
+{id:523,word:"e-mail",kana:"イーメール",pos:"動",meaning:"～にe-mailを送る",comment:"",deck:"09-1"},
+{id:524,word:"Won't it be ~?",kana:"ウォント イット ビー",pos:"",meaning:"～じゃないかな？／～だよね？",comment:"",deck:"09-1"},
+{id:525,word:"yolk",kana:"ヨーク",pos:"名",meaning:"黄身",comment:"←→ egg white（白身）",deck:"09-1"},
+{id:526,word:"excursion",kana:"エクスカーション",pos:"名",meaning:"小旅行、遠足",comment:"",deck:"09-1"},
+{id:527,word:"set apart",kana:"セット アパート",pos:"",meaning:"Aを(他と)区別する",comment:"",deck:"09-1"},
+{id:528,word:"prescription",kana:"プレスクリプション",pos:"名",meaning:"処方箋",comment:"",deck:"09-1"},
+{id:529,word:"be being",kana:"ビー ビーイング",pos:"形",meaning:"〜の状態にしておく",comment:"",deck:"09-1"},
+{id:530,word:"reimbursement",kana:"リインバースメント",pos:"名",meaning:"払い戻し",comment:"",deck:"09-1"},
+{id:531,word:"be willing to",kana:"ビー ウィリング トゥ",pos:"",meaning:"〜しても構わない",comment:"",deck:"09-1"},
+{id:532,word:"notify",kana:"ノウティファイ",pos:"動",meaning:"通知する",comment:"",deck:"09-1"},
+{id:533,word:"inventory",kana:"インベントリー",pos:"名",meaning:"在庫",comment:"",deck:"09-1"},
+{id:534,word:"consume",kana:"コンシューム",pos:"動",meaning:"消費する、使い果たす",comment:"",deck:"09-1"},
+{id:535,word:"feature",kana:"フィーチャー",pos:"名",meaning:"特徴、顔立ち",comment:"",deck:"09-1"},
+{id:536,word:"interest",kana:"インタレスト",pos:"名",meaning:"利息",comment:"",deck:"09-1"},
+{id:537,word:"down payment",kana:"ダウン ペイメント",pos:"",meaning:"頭金",comment:"",deck:"09-1"},
+{id:538,word:"intimate",kana:"インティメット",pos:"形",meaning:"深い、親密な",comment:"",deck:"09-1"},
+{id:539,word:"down the hall",kana:"ダウン ザ ホール",pos:"",meaning:"廊下の先に",comment:"",deck:"09-1"},
+{id:540,word:"knowledgeable",kana:"ノレッジャブル",pos:"形",meaning:"知識豊富な",comment:"",deck:"09-1"},
+{id:541,word:"take apart",kana:"テイク アパート",pos:"",meaning:"解体する",comment:"",deck:"09-2"},
+{id:542,word:"accurate",kana:"アキュレット",pos:"形",meaning:"正確な",comment:"←→ inaccurate...誤った",deck:"09-2"},
+{id:543,word:"protagonist",kana:"プロタゴニスト",pos:"名",meaning:"主人公",comment:"",deck:"09-2"},
+{id:544,word:"likelihood",kana:"ライクリフッド",pos:"名",meaning:"見込み、可能性",comment:"",deck:"09-2"},
+{id:545,word:"I couldn't be happier.",kana:"アイ クドゥント ビー ハピアー",pos:"",meaning:"これ以上ないほど幸せです。",comment:"否定＋比較級…「これ以上ないほど〜」",deck:"09-2"},
+{id:546,word:"forecast",kana:"フォーキャスト",pos:"動",meaning:"予想する、予報する",comment:"",deck:"09-2"},
+{id:547,word:"plenty of",kana:"プレンティー オブ",pos:"",meaning:"たくさんの",comment:"",deck:"09-2"},
+{id:548,word:"respectively",kana:"リスペクティブリー",pos:"副",meaning:"めいめいに、それぞれ",comment:"",deck:"09-2"},
+{id:549,word:"Acquisition",kana:"アクイジション",pos:"名",meaning:"獲得、取得",comment:"",deck:"09-2"},
+{id:550,word:"whisk",kana:"ウィスク",pos:"動",meaning:"素早く連れ去る",comment:"",deck:"09-2"},
+{id:551,word:"beloved",kana:"ビラブド",pos:"形",meaning:"最愛の、愛しい",comment:"",deck:"09-2"},
+{id:552,word:"ashore",kana:"アショア",pos:"副",meaning:"岸に、岸へ、陸上に",comment:"",deck:"09-2"},
+{id:553,word:"comb",kana:"コーム",pos:"名",meaning:"櫛（くし）【動】（櫛で）とかす",comment:"",deck:"09-2"},
+{id:554,word:"meteorologist",kana:"ミーティオロジスト",pos:"名",meaning:"気象予報士",comment:"",deck:"09-2"},
+{id:555,word:"manuscript",kana:"マニュスクリプト",pos:"名",meaning:"原稿",comment:"",deck:"09-2"},
+{id:556,word:"installment",kana:"インストールメント",pos:"名",meaning:"分割払い",comment:"",deck:"09-2"},
+{id:557,word:"predicament",kana:"プリディカメント",pos:"名",meaning:"窮地、苦境",comment:"",deck:"09-2"},
+{id:558,word:"synopsis",kana:"シノプシス",pos:"名",meaning:"あらすじ、大意",comment:"",deck:"09-2"},
+{id:559,word:"disposal",kana:"ディスポーザル",pos:"名",meaning:"廃棄",comment:"",deck:"09-2"},
+{id:560,word:"installation",kana:"インストレーション",pos:"名",meaning:"取り付け、設置",comment:"",deck:"09-2"},
+{id:561,word:"In sum",kana:"イン サム",pos:"",meaning:"要するに",comment:"",deck:"09-2"},
+{id:562,word:"not until tomorrow",kana:"ノット アンティル トゥモロウ",pos:"",meaning:"明日になってからそれをする",comment:"",deck:"09-2"},
+{id:563,word:"availability",kana:"アベイラビリティー",pos:"名",meaning:"都合、有効性、入手可能性",comment:"",deck:"09-2"},
+{id:564,word:"minimalist",kana:"ミニマリスト",pos:"名",meaning:"最小限の",comment:"",deck:"09-2"},
+{id:565,word:"cleanliness",kana:"クレンリネス",pos:"名",meaning:"清潔さ",comment:"",deck:"09-2"},
+{id:566,word:"capture",kana:"キャプチャー",pos:"動",meaning:"獲得する、捉える",comment:"",deck:"09-2"},
+{id:567,word:"productivity",kana:"プロダクティビティー",pos:"名",meaning:"生産性",comment:"",deck:"09-2"}
+];
+
+// ── STATE ────────────────────────────────────────────
+let words=[], deck=[], idx=0, isFlipped=false;
+let sessionKnown=0, sessionWeak=0, sessionSkip=0;
+let studyMode='all', studyDeckId=null;
+let filterDeck='all', filterWeak=false;
+const synth=window.speechSynthesis;
+let voices=[];
+
+function loadData(){
+  const saved=localStorage.getItem('toeic_v2');
+  const weakMap=JSON.parse(localStorage.getItem('toeic_weak')||'{}');
+  words=saved?JSON.parse(saved):RAW.map(w=>({...w,weak:false}));
+  words.forEach(w=>{ w.weak=!!weakMap[w.id]; });
+  // ensure kana exists
+  words.forEach(w=>{ if(!w.kana) w.kana=''; });
+}
+function saveData(){
+  localStorage.setItem('toeic_v2',JSON.stringify(words));
+  const m={};words.forEach(w=>{if(w.weak)m[w.id]=true;});
+  localStorage.setItem('toeic_weak',JSON.stringify(m));
+}
+function saveDeckStudied(deckId){
+  const key='toeic_studied';
+  const map=JSON.parse(localStorage.getItem(key)||'{}');
+  map[deckId]=Date.now();
+  localStorage.setItem(key,JSON.stringify(map));
+}
+function getRecentDecks(){
+  const map=JSON.parse(localStorage.getItem('toeic_studied')||'{}');
+  const cutoff=Date.now()-24*60*60*1000;
+  return Object.entries(map).filter(([,t])=>t>cutoff).map(([d])=>d);
+}
+
+// ── SPEECH ───────────────────────────────────────────
+function loadVoices(){voices=synth.getVoices().filter(v=>v.lang.startsWith('en'));if(!voices.length)setTimeout(loadVoices,300);}
+loadVoices();
+if(synth.onvoiceschanged!==undefined)synth.onvoiceschanged=loadVoices;
+function speak(){
+  if(!synth)return;synth.cancel();
+  const card=deck[idx];if(!card)return;
+  const utt=new SpeechSynthesisUtterance(card.word);
+  utt.lang='en-US';utt.rate=0.88;
+  if(voices.length)utt.voice=voices[0];
+  const btns=document.querySelectorAll('.speak-btn');
+  btns.forEach(b=>b.classList.add('playing'));
+  utt.onend=()=>btns.forEach(b=>b.classList.remove('playing'));
+  synth.speak(utt);
+}
+
+// ── HOME ─────────────────────────────────────────────
+function updateHome(){
+  const total=words.length;
+  const weak=words.filter(w=>w.weak).length;
+  const decks=[...new Set(words.map(w=>w.deck))];
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statWeak').textContent=weak;
+  document.getElementById('statDecks').textContent=decks.length;
+  document.getElementById('homeSubtitle').textContent=`${total}語 · ${decks.length}デッキ`;
+
+  // recent decks
+  const recent=getRecentDecks();
+  const rHead=document.getElementById('recentSectionHead');
+  const rList=document.getElementById('recentDeckList');
+  if(recent.length){
+    rHead.style.display='';
+    rList.innerHTML=recent.sort().map(d=>{
+      const dw=words.filter(w=>w.deck===d);
+      return `<div class="deck-row recent-deck" onclick="startStudy('deck','${d}')">
+        <div class="deck-dot recent"></div>
+        <div class="deck-info"><div class="deck-name">デッキ ${d}</div><div class="deck-count">${dw.length}語</div></div>
+        <span class="recent-badge">最近</span>
+      </div>`;
+    }).join('');
+  } else {
+    rHead.style.display='none';
+    rList.innerHTML='';
+  }
+
+  // all decks
+  document.getElementById('deckList').innerHTML=decks.sort().map(d=>{
+    const dw=words.filter(w=>w.deck===d);
+    const wk=dw.filter(w=>w.weak).length;
+    return `<div class="deck-row" onclick="startStudy('deck','${d}')">
+      <div class="deck-dot"></div>
+      <div class="deck-info"><div class="deck-name">デッキ ${d}</div><div class="deck-count">${dw.length}語${wk?` · 苦手${wk}語`:''}</div></div>
+      <div class="deck-prog">→</div>
+    </div>`;
+  }).join('');
+
+  // populate deck select in manage
+  const sel=document.getElementById('newDeck');
+  const cur=sel.value;
+  sel.innerHTML=decks.sort().map(d=>`<option value="${d}">デッキ ${d}</option>`).join('')
+    +'<option value="new">新しいデッキ…</option>';
+  sel.value=cur||decks[0]||'new';
+}
+
+// ── STUDY ─────────────────────────────────────────────
+function startStudy(mode,deckId){
+  studyMode=mode;studyDeckId=deckId||null;
+  sessionKnown=sessionWeak=sessionSkip=0;
+  if(mode==='all') deck=shuffle([...words]);
+  else if(mode==='weak'){
+    deck=shuffle(words.filter(w=>w.weak));
+    if(!deck.length){showToast('苦手単語がありません');return;}
+  } else {
+    deck=shuffle(words.filter(w=>w.deck===deckId));
+    saveDeckStudied(deckId);
+  }
+  idx=0;showScreen('study');
+  const tag=document.getElementById('modeTag');
+  tag.className='mode-tag'+(mode==='weak'?' weak':'');
+  tag.textContent=mode==='all'?'全単語':mode==='weak'?'苦手単語':`デッキ ${deckId}`;
+  document.getElementById('studyTitle').textContent=mode==='deck'?`デッキ ${deckId}`:mode==='weak'?'苦手復習':'全単語';
+  document.getElementById('studyDeckLabel').textContent=`${deck.length}語`;
+  renderCard();
+}
+function showDeckSelect(){ /* same as clicking deck list on home - scroll down */ }
+
+function renderCard(){
+  if(idx>=deck.length){showResult();return;}
+  const card=deck[idx];
+  isFlipped=false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('flipHint').style.opacity='1';
+  const pct=(idx/deck.length)*100;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=`${idx+1} / ${deck.length}`;
+  // front
+  document.getElementById('frontDeck').textContent=`DECK ${card.deck}`;
+  document.getElementById('frontKana').textContent=card.kana||'';
+  document.getElementById('frontWord').textContent=card.word;
+  document.getElementById('frontComment').textContent=card.comment||'';
+  // back
+  document.getElementById('backKana').textContent=card.kana||'';
+  document.getElementById('backWord').textContent=card.word;
+  document.getElementById('backPos').textContent=card.pos?`【${card.pos}】`:'—';
+  document.getElementById('backMeaning').textContent=card.meaning;
+  document.getElementById('backComment').textContent=card.comment||'';
+  document.getElementById('cardWrap').style.filter=card.weak?'drop-shadow(0 0 12px rgba(255,107,138,.35))':'none';
+}
+
+function flipCard(){
+  isFlipped=!isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped',isFlipped);
+  if(isFlipped)document.getElementById('flipHint').style.opacity='0';
+}
+function markKnown(){sessionKnown++;swipeCard('right');}
+function markWeak(){
+  const card=deck[idx];
+  const w=words.find(x=>x.id===card.id);
+  if(w){w.weak=true;card.weak=true;saveData();}
+  sessionWeak++;swipeCard('left');
+}
+function nextCard(counted){if(counted)sessionSkip++;swipeCard('left');}
+function swipeCard(dir){
+  const wrap=document.getElementById('cardWrap');
+  wrap.classList.add(dir==='right'?'swiping-right':'swiping-left');
+  setTimeout(()=>{wrap.classList.remove('swiping-right','swiping-left');idx++;renderCard();},280);
+}
+function shuffleDeck(){deck=shuffle([...deck].slice(idx));idx=0;renderCard();showToast('シャッフルしました');}
+
+// ── RESULT ────────────────────────────────────────────
+function showResult(){
+  showScreen('result');
+  document.getElementById('resKnown').textContent=sessionKnown;
+  document.getElementById('resWeak').textContent=sessionWeak;
+  document.getElementById('resSkip').textContent=sessionSkip;
+  const total=sessionKnown+sessionWeak+sessionSkip;
+  const pct=total?Math.round(sessionKnown/total*100):0;
+  let emoji='🎉',title='お疲れ様！';
+  if(pct>=80){emoji='🏆';title='素晴らしい！';}
+  else if(pct>=60){emoji='👍';title='いい調子！';}
+  else{emoji='💪';title='もう一頑張り！';}
+  document.getElementById('resultEmoji').textContent=emoji;
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultSub').textContent=`正解率 ${pct}% · ${total}語学習`;
+}
+function restartStudy(){startStudy(studyMode,studyDeckId);}
+function studyWeak(){startStudy('weak');}
+
+// ── MANAGE ────────────────────────────────────────────
+function goManage(){showScreen('manage');renderFilterChips();renderWordList();
+  document.getElementById('newDeck').onchange=function(){
+    document.getElementById('newDeckName').style.display=this.value==='new'?'block':'none';
+  };
+}
+function renderFilterChips(){
+  const decks=[...new Set(words.map(w=>w.deck))].sort();
+  document.getElementById('filterChips').innerHTML=
+    `<div class="filter-chip ${filterDeck==='all'?'on':''}" onclick="setFilter('all')">すべて</div>`+
+    `<div class="filter-chip ${filterWeak?'on':''}" onclick="toggleWeakFilter()">🔥 苦手</div>`+
+    decks.map(d=>`<div class="filter-chip ${filterDeck===d?'on':''}" onclick="setFilter('${d}')">デッキ${d}</div>`).join('');
+}
+function setFilter(d){filterDeck=d;renderFilterChips();renderWordList();}
+function toggleWeakFilter(){filterWeak=!filterWeak;renderFilterChips();renderWordList();}
+function renderWordList(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  let list=words;
+  if(filterDeck!=='all')list=list.filter(w=>w.deck===filterDeck);
+  if(filterWeak)list=list.filter(w=>w.weak);
+  if(q)list=list.filter(w=>w.word.toLowerCase().includes(q)||w.meaning.includes(q));
+  document.getElementById('wordTable').innerHTML=list.map(w=>`
+    <div class="word-row ${w.weak?'weak-row':''}">
+      <div class="word-main">
+        <div class="word-en">${w.word}${w.weak?' 🔥':''}</div>
+        <div class="word-jp">${w.pos?`【${w.pos}】`:''}${w.meaning}</div>
+      </div>
+      <div class="word-actions">
+        <button class="icon-btn" onclick="toggleWeakWord(${w.id})">${w.weak?'❤️‍🔥':'🤍'}</button>
+        <button class="icon-btn" onclick="editWord(${w.id})">✏️</button>
+        <button class="icon-btn" onclick="deleteWord(${w.id})">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+function addWord(){
+  const word=document.getElementById('newWord').value.trim();
+  const kana=document.getElementById('newKana').value.trim();
+  const pos=document.getElementById('newPos').value.trim();
+  const meaning=document.getElementById('newMeaning').value.trim();
+  const comment=document.getElementById('newComment').value.trim();
+  let deckVal=document.getElementById('newDeck').value;
+  if(deckVal==='new')deckVal=document.getElementById('newDeckName').value.trim()||'new';
+  if(!word||!meaning){showToast('英単語と意味は必須です');return;}
+  const newId=Math.max(...words.map(w=>w.id),0)+1;
+  words.push({id:newId,word,kana,pos,meaning,comment,deck:deckVal,weak:false});
+  saveData();
+  ['newWord','newKana','newPos','newMeaning','newComment'].forEach(id=>document.getElementById(id).value='');
+  renderWordList();renderFilterChips();updateHome();
+  showToast(`「${word}」を追加しました`);
+}
+function toggleWeakWord(id){const w=words.find(x=>x.id===id);if(w){w.weak=!w.weak;saveData();renderWordList();updateHome();}}
+function editWord(id){
+  const w=words.find(x=>x.id===id);if(!w)return;
+  const nw=prompt('英単語:',w.word);if(nw===null)return;
+  const nm=prompt('意味:',w.meaning);if(nm===null)return;
+  const nk=prompt('カタカナよみがな:',w.kana||'');
+  const np=prompt('品詞:',w.pos);
+  const nc=prompt('備考:',w.comment);
+  w.word=nw.trim()||w.word;w.meaning=nm.trim()||w.meaning;
+  if(nk!==null)w.kana=nk.trim();
+  if(np!==null)w.pos=np.trim();
+  if(nc!==null)w.comment=nc.trim();
+  saveData();renderWordList();showToast('更新しました');
+}
+function deleteWord(id){
+  if(!confirm('この単語を削除しますか？'))return;
+  words=words.filter(x=>x.id!==id);saveData();renderWordList();updateHome();showToast('削除しました');
+}
+function exportCSV(){
+  const rows=[['FrontText','BackText','Comment','Kana','Deck']];
+  words.forEach(w=>rows.push([w.word,`【${w.pos}】${w.meaning}`,w.comment,w.kana||'',w.deck]));
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='toeic_export.csv';a.click();
+  showToast('CSVをエクスポートしました');
+}
+function importCSV(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const lines=e.target.result.split(/\r?\n/).filter(Boolean);
+    let added=0;const maxId=Math.max(...words.map(w=>w.id),0);
+    lines.slice(1).forEach((line,i)=>{
+      const cols=parseCSVLine(line);
+      const word=(cols[0]||'').trim();const back=(cols[1]||'').trim();
+      const comment=(cols[2]||'').trim();const kana=(cols[3]||'').trim();
+      if(!word)return;
+      const pm=back.match(/【(.+?)】(.+)/);
+      const pos=pm?pm[1]:'';const meaning=pm?pm[2].trim():back;
+      words.push({id:maxId+i+1,word,kana,pos,meaning,comment,deck:'imported',weak:false});
+      added++;
+    });
+    saveData();renderWordList();renderFilterChips();updateHome();
+    showToast(`${added}語インポートしました`);input.value='';
+  };
+  reader.readAsText(file,'utf-8');
+}
+function parseCSVLine(line){
+  const r=[];let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    if(line[i]==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(line[i]===','&&!inQ){r.push(cur);cur='';}
+    else cur+=line[i];
+  }r.push(cur);return r;
+}
+
+// ── UTILS ────────────────────────────────────────────
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goHome(){showScreen('home');updateHome();}
+let toastTimer;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
+
+// swipe
+let tx=0,ty=0;
+document.getElementById('cardWrap').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.getElementById('cardWrap').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){if(dx>0)markKnown();else nextCard(true);}
+},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('study').classList.contains('active'))return;
+  if(e.key===' '){e.preventDefault();flipCard();}
+  else if(e.key==='ArrowRight')markKnown();
+  else if(e.key==='ArrowLeft')nextCard(true);
+  else if(e.key==='ArrowDown')markWeak();
+});
+
+// ── INIT ────────────────────────────────────────────
+loadData();updateHome();
+</script>
+</body>
+</html>
