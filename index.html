@@ -75,6 +75,7 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg)
 .mode-tag{display:inline-block;font-size:10px;font-family:'Outfit',sans-serif;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:rgba(79,138,255,.15);color:var(--accent)}
 .mode-tag.weak{background:rgba(255,107,138,.15);color:var(--rose)}
 .card-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 18px;perspective:1400px;overflow:hidden}
+.card-outer{width:100%;max-width:420px;display:flex;align-items:center;margin-bottom:8px;padding:0 4px;}
 .card-wrap{width:100%;max-width:420px;height:min(62vw,340px);position:relative;cursor:pointer}
 .flashcard{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
 .flashcard.flipped{transform:rotateY(180deg)}
@@ -87,8 +88,8 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg)
 .speak-btn{background:rgba(79,138,255,.12);border:none;color:var(--accent);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .speak-btn:active{transform:scale(.9);background:rgba(79,138,255,.25)}
 .speak-btn.playing{color:var(--green);background:rgba(52,211,153,.15)}
-.prev-btn{background:rgba(255,255,255,.06);border:none;color:var(--text3);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;position:absolute;top:14px;left:14px;}
-.prev-btn:active{transform:scale(.9);background:rgba(255,255,255,.12);color:var(--text);}
+.prev-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:var(--text);width:38px;height:38px;border-radius:12px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.prev-btn:active{transform:scale(.9);background:rgba(255,255,255,.18);}
 .prev-btn:disabled{opacity:.2;cursor:default;}
 
 /* FRONT card */
@@ -242,10 +243,12 @@ select option{background:var(--surface)}
     <span class="mode-tag" id="modeTag">全単語</span>
   </div>
   <div class="card-area" id="cardArea">
+    <div class="card-outer">
+      <button class="prev-btn" id="prevBtn" onclick="prevCard()" title="前のカードに戻る">←</button>
+    </div>
     <div class="card-wrap" id="cardWrap" onclick="flipCard()">
       <div class="flashcard" id="flashcard">
         <div class="face face-front">
-          <button class="prev-btn" id="prevBtn" onclick="event.stopPropagation();prevCard()" title="前のカードに戻る">←</button>
           <div class="card-corner">
             <button class="speak-btn" id="speakFront" onclick="event.stopPropagation();speak()">🔊</button>
           </div>
@@ -1239,8 +1242,119 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='ArrowDown')markWeak();
 });
 
+
+// ── PUSH NOTIFICATIONS ───────────────────────────────
+const NOTIF_MESSAGES = {
+  12: [
+    "もうお昼だよ。人間の寿命は短いんだから、今のうちに1デッキくらい進めておいたら？（フリーレン）",
+    "12時です。午後の勉強に響きますから、今のうちに単語を見ておいてください。見てますからね。（フェルン）",
+    "やあ、お昼だね。君が単語帳を開く姿、きっと後で見返した時に『美しかった』と思えるはずだよ。（ヒンメル）",
+    "うわっ、もう12時かよ！俺も修行中だし、あんたも一緒にデッキを片付けようぜ。……怖いけどさ。（シュタルク）",
+    "お昼時ですね。単語を覚えるのは徳を積むのと同じですよ。さあ、健やかな心で一歩前へ。（ハイター）",
+    "座れ。そして単語を読め。積み重ねた時間は裏切らん。まずは1デッキだ。（アイゼン）",
+    "おいおい、もう昼だぞ。シャキッとしろよ。大人の余裕を見せて単語くらいサクッとクリアしちまえ。（ザイン）",
+    "魔法も英語も基礎が全て。お昼の隙間時間に単語を詰め込む、それが頂点への近道だよ。（フランメ）",
+    "お昼寝もいいけど、単語を覚える魔法があったら便利なのにね。……ないから、自分でやるしかないよ。（フリーレン）",
+    "ランチタイムを制する者が、TOEICを制する……。嘘じゃない、真実の話だよ。（アイ）",
+    "お昼休みだね！この空き時間に1デッキ終わらせちゃうのが、売れっ子への第一歩だよ☆（アイ）",
+    "おつえーむ！休憩中のみんな、スマホ触るついでに単語もポチポチしちゃお？（MEMちょ）",
+    "午後の仕事に備えて、頭の準備運動も必要よ。まずは1デッキ、やっておきましょうか。（斉藤ミヤコ）",
+    "腹筋の後は脳トレだ！さあ、大きな声で（心の中で）単語をリピート！ピーヨン！（ぴえヨン）",
+    "……。あ、お昼？……単語、やったら？（寿みなみ）"
+  ],
+  15: [
+    "……まだ3デッキ終わっていませんね？おやつは単語をやってからにしてください。太りますよ。（フェルン）",
+    "3時か。おやつもいいけど、この単語アプリを触ってみたら？（フリーレン）",
+    "師匠に怒られるよりは、単語やる方がマシだよな……。よし、俺と一緒に頑張ろうぜ！（シュタルク）",
+    "挫けそうな時は思い出して。君は一人じゃない。僕たちが君の努力を覚えているからね。（ヒンメル）",
+    "手が止まっているぞ。体が覚えるまで繰り返せ。それが戦士の、いや、受験者のやり方だ。（アイゼン）",
+    "私の弟子ならこの程度のミッション、一瞬で終わらせるはずだが。貴様はどうだ？（ゼーリエ）",
+    "10年後の君が後悔しないように、今、少しだけ頑張ってみようよ。たった10分でいいから。（フリーレン）",
+    "若造が。足掻いて、足掻いて、その先にしか勝利はないぞ。単語帳を開け！（デンケン）",
+    "ちょっとお疲れ？でも、キミの努力は私がちゃーんと見てるよ。あと少し、頑張って！（アイ）",
+    "ねぇねぇ、サボっちゃダメだよ！一緒に目標点数を目指すって決めたでしょ！（ルビー）",
+    "アンタ、そんな顔して……さては2デッキ目、まだ終わってないわね？ほら、やりなさいよ！（有馬かな）",
+    "集中が切れる時間帯ですね。私のプロファイリングによると、あなたは今やれば覚えられるタイプです。（黒川あかね）",
+    "お疲れサマー！今の努力、きっとバズるよ！……あ、単語の話ね。さあ、画面開いて！（MEMちょ）",
+    "ほらほら、単語帳が泣いてるぞ！追い込め追い込めー！（ぴえヨン）",
+    "……。休憩おわり。単語、一緒にやる？（寿みなみ）"
+  ],
+  18: [
+    "日が暮れてきたね。冒険（勉強）の続きを始めようか。あと何デッキ残ってる？（フリーレン）",
+    "18時です。まだミッションが残っていますね。……不機嫌になる前に終わらせてください。（フェルン）",
+    "腹減ったなぁ。でも、今日のノルマを終わらせないと飯がまずくなる。あんたもそうだろ？（シュタルク）",
+    "君が積み上げた単語の一つひとつが、いつか世界を変える力になる。僕はそう信じているよ。（ヒンメル）",
+    "一日の仕上げだ。ここで踏ん張れる奴が、最後に笑う。斧を振るように、単語を刻め。（アイゼン）",
+    "お疲れ様です。今日という日を最高の形で終えるために、あと少しだけ徳を積みましょう。（ハイター）",
+    "そんなに怖がらなくても大丈夫だよ。一歩ずつやれば、きっと終わるから。応援してるね。（カンネ）",
+    "私の言った通りにすれば、あなたは最強になれる。さあ、夕方のミッション開始だ。（フランメ）",
+    "お仕事や学校、お疲れ様！今日のミッション、覚えてる？（アイ）",
+    "もうすぐ夜だー！今日の目標、3デッキ。まだ残ってるなら、私と一緒に走ろう！（ルビー）",
+    "ふん、どうせ疲れたとか言って言い訳するんでしょ？……期待、裏切らないでよね。（有馬かな）",
+    "今日のあなたの行動履歴を確認しました。……まだ1デッキ残っていますね？仕上げましょう。（黒川あかね）",
+    "今日の進捗どうかなー？今すぐクリアして、夜はSNSをゆっくり楽しもうよ！（MEMちょ）",
+    "いい汗かいたかーい！？最後の一振り（デッキ）、出し切って終わろうぜ！ピーヨン！（ぴえヨン）",
+    "……。夜ごはんの前に、単語。終わらせたら、美味しいよ。（寿みなみ）"
+  ],
+  21: [
+    "……まだ終わっていないのですか？もう寝る時間ですよ。早く終わらせて寝てください。バカ。（フェルン）",
+    "夜は長いけど、君の集中力はそんなに持たないでしょ。今のうちに3デッキ、クリアしちゃいなよ。（フリーレン）",
+    "今日という日の終わりに、君の勇気を見せてほしい。さあ、最後のデッキを始めようか。（ヒンメル）",
+    "よし、これが終われば今日の修行は終わりだ！あんたが頑張るなら、俺も寝ないで付き合うよ。（シュタルク）",
+    "安らかな眠りにつくために、心のつっかえ（未完了のデッキ）は取っておきましょうね。（ハイター）",
+    "よくやった、と言いたいところだが、まだ最後の一撃が残っているぞ。集中しろ。（アイゼン）",
+    "おい、いつまで起きてるんだ。サクッと終わらせて、明日に備えろよ。それが大人だ。（ザイン）",
+    "君が覚えたその単語、いつか誰かと話す時にきっと役に立つよ。……魔法みたいにね。（フリーレン）",
+    "お疲れ様でした。……ミッションクリアしたら、少しだけ褒めてあげてもいいですよ？（フェルン）",
+    "今日も一日頑張ったね！最後のデッキ、クリアしちゃお？君なら絶対できるよ！（アイ）",
+    "やったー！ラスト1デッキ！これが終われば、最高の気分で夢が見れるよ！（ルビー）",
+    "今日覚えた単語は、寝ている間に脳に刻まれます。完璧な回答のために。（黒川あかね）",
+    "明日になって後悔するのはプロ失格よ。今、ここで終わらせなさい。おやすみの挨拶はそれから。（斉藤ミヤコ）",
+    "限界を超えろ！ラスト1デッキ！明日、最強の自分に出会うために！ピーヨン！（ぴえヨン）",
+    "最後まで頑張る君は、私にとって一番の推しだよ。……ミッションクリア、楽しみにしてるね。（アイ）"
+  ]
+};
+
+function getRandMsg(hour){
+  const list=NOTIF_MESSAGES[hour];
+  return list[Math.floor(Math.random()*list.length)];
+}
+
+async function initNotifications(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='default'){
+    await Notification.requestPermission();
+  }
+  if(Notification.permission==='granted'){
+    scheduleNotifications();
+  }
+}
+
+function scheduleNotifications(){
+  if(sessionStorage.getItem('notif_scheduled'))return;
+  sessionStorage.setItem('notif_scheduled','1');
+  const targets=[12,15,18,21];
+  const now=new Date();
+  targets.forEach(hour=>{
+    const target=new Date();
+    target.setHours(hour,0,0,0);
+    const diff=target-now;
+    if(diff>0){
+      setTimeout(()=>{
+        if(Notification.permission==='granted'){
+          new Notification('📚 TOEIC単語帳',{
+            body:getRandMsg(hour),
+            tag:`toeic-${hour}`,
+            renotify:true
+          });
+        }
+      },diff);
+    }
+  });
+}
+
 // ── INIT ────────────────────────────────────────────
-loadData();updateHome();
+loadData();updateHome();initNotifications();
 </script>
 </body>
 </html>
