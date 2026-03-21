@@ -87,6 +87,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg)
 .speak-btn{background:rgba(79,138,255,.12);border:none;color:var(--accent);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .speak-btn:active{transform:scale(.9);background:rgba(79,138,255,.25)}
 .speak-btn.playing{color:var(--green);background:rgba(52,211,153,.15)}
+.prev-btn{background:rgba(255,255,255,.06);border:none;color:var(--text3);width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;position:absolute;top:14px;left:14px;}
+.prev-btn:active{transform:scale(.9);background:rgba(255,255,255,.12);color:var(--text);}
+.prev-btn:disabled{opacity:.2;cursor:default;}
 
 /* FRONT card */
 .card-deck-tag{font-family:'Space Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:.08em;margin-bottom:4px}
@@ -242,6 +245,7 @@ select option{background:var(--surface)}
     <div class="card-wrap" id="cardWrap" onclick="flipCard()">
       <div class="flashcard" id="flashcard">
         <div class="face face-front">
+          <button class="prev-btn" id="prevBtn" onclick="event.stopPropagation();prevCard()" title="前のカードに戻る">←</button>
           <div class="card-corner">
             <button class="speak-btn" id="speakFront" onclick="event.stopPropagation();speak()">🔊</button>
           </div>
@@ -1052,12 +1056,26 @@ function renderCard(){
   document.getElementById('backMeaning').textContent=card.meaning;
   document.getElementById('backComment').textContent=card.comment||'';
   document.getElementById('cardWrap').style.filter=card.weak?'drop-shadow(0 0 12px rgba(255,107,138,.35))':'none';
+  // 戻るボタンの有効/無効
+  const prevBtn=document.getElementById('prevBtn');
+  if(prevBtn) prevBtn.disabled=(idx===0);
+  // 新カード表示時に自動音声再生（少し遅延してアニメ後に再生）
+  setTimeout(()=>speak(), 320);
 }
 
 function flipCard(){
   isFlipped=!isFlipped;
   document.getElementById('flashcard').classList.toggle('flipped',isFlipped);
   if(isFlipped)document.getElementById('flipHint').style.opacity='0';
+}
+function prevCard(){
+  if(idx<=0)return;
+  synth.cancel();
+  idx--;
+  // 裏返っていたらリセット
+  isFlipped=false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  renderCard();
 }
 function markKnown(){sessionKnown++;swipeCard('right');}
 function markWeak(){
