@@ -33,6 +33,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg)
 
 /* HOME */
 #home{padding-bottom:32px}
+.achieve-banner{display:none;align-items:center;justify-content:center;gap:10px;margin:0 18px 0;padding:14px 18px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:16px;font-family:'Outfit',sans-serif;font-weight:800;font-size:16px;color:#1a1200;box-shadow:0 4px 20px rgba(251,191,36,.4);}
+.achieve-banner .achieve-icon{font-size:22px;}
+.deck-last-date{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);white-space:nowrap;}
 .home-hero{padding:28px 20px 20px;text-align:center}
 .hero-logo{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
 .hero-title{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;line-height:1.15;color:var(--text)}
@@ -180,6 +183,9 @@ select option{background:var(--surface)}
 
 <!-- HOME -->
 <div class="screen active" id="home">
+  <div class="achieve-banner" id="achieveBanner">
+    <span class="achieve-icon">🏆</span>本日分達成！お疲れ様でした！<span class="achieve-icon">🎉</span>
+  </div>
   <div class="topnav">
     <div>
       <div class="nav-title">TOEIC 単語帳</div>
@@ -916,7 +922,37 @@ const RAW = [
 {id:564,word:"minimalist",kana:"ミニマリスト",pos:"名",meaning:"最小限の",comment:"",deck:"18"},
 {id:565,word:"cleanliness",kana:"クレンリネス",pos:"名",meaning:"清潔さ",comment:"",deck:"18"},
 {id:566,word:"capture",kana:"キャプチャー",pos:"動",meaning:"獲得する、捉える",comment:"",deck:"18"},
-{id:567,word:"productivity",kana:"プロダクティビティー",pos:"名",meaning:"生産性",comment:"",deck:"18"}
+{id:567,word:"productivity",kana:"プロダクティビティー",pos:"名",meaning:"生産性",comment:"",deck:"18"},
+{id:568,word:"back to back",kana:"バック トゥ バック",pos:"",meaning:"立て続けに",comment:"",deck:"19"},
+{id:569,word:"long ago",kana:"ロング アゴウ",pos:"形",meaning:"昔の",comment:"",deck:"19"},
+{id:570,word:"advertisment",kana:"アドバーティスメント",pos:"",meaning:"広告",comment:"発音が ✕アドバタイズメント→◯アドバーティスメント",deck:"19"},
+{id:571,word:"efficient",kana:"イフィシェント",pos:"形",meaning:"効率的な、有能な",comment:"",deck:"19"},
+{id:572,word:"warranty",kana:"ウォランティー",pos:"名",meaning:"根拠、正当な理由、保証",comment:"",deck:"19"},
+{id:573,word:"expire",kana:"エクスパイアー",pos:"動",meaning:"期限が満了する・終了する",comment:"",deck:"19"},
+{id:574,word:"Pest control",kana:"ペスト コントロール",pos:"名",meaning:"害虫駆除",comment:"",deck:"19"},
+{id:575,word:"enrollment",kana:"エンロールメント",pos:"名",meaning:"登録、入学",comment:"",deck:"19"},
+{id:576,word:"conclusion",kana:"コンクルージョン",pos:"名",meaning:"終盤、終わり、結び",comment:"",deck:"19"},
+{id:577,word:"inquire",kana:"インクワイアー",pos:"動",meaning:"尋ねる",comment:"",deck:"19"},
+{id:578,word:"archaeology",kana:"アーキオロジー",pos:"名",meaning:"考古学",comment:"",deck:"19"},
+{id:579,word:"won't",kana:"ウォント",pos:"",meaning:"未来・意志の否定、強い拒絶、故障して動かない",comment:"",deck:"19"},
+{id:580,word:"know to do 〜",kana:"ノウ トゥ ドゥ",pos:"",meaning:"〜すべきことを知っている",comment:"",deck:"19"},
+{id:581,word:"twice",kana:"トゥワイス",pos:"副",meaning:"2度、2倍",comment:"",deck:"19"},
+{id:582,word:"cod fish",kana:"コッド フィッシュ",pos:"名",meaning:"鱈（タラ）",comment:"",deck:"19"},
+{id:583,word:"take back 〜",kana:"テイク バック",pos:"",meaning:"引き取る、撤回する",comment:"",deck:"19"},
+{id:584,word:"be referred by A to B",kana:"ビー リファード バイ エー トゥ ビー",pos:"",meaning:"AにBを紹介される",comment:"",deck:"19"},
+{id:585,word:"splash pad",kana:"スプラッシュ パッド",pos:"名",meaning:"水遊び場",comment:"",deck:"19"},
+{id:586,word:"warrantly",kana:"ウォランティー",pos:"名",meaning:"品質保証",comment:"",deck:"19"},
+{id:587,word:"among other things",kana:"アマング アザー シングズ",pos:"",meaning:"とりわけ",comment:"",deck:"19"},
+{id:588,word:"Ideally",kana:"アイディアリー",pos:"副",meaning:"理想的には",comment:"",deck:"19"},
+{id:589,word:"adjacent",kana:"アジェイセント",pos:"形",meaning:"隣接した",comment:"",deck:"19"},
+{id:590,word:"rot",kana:"ロット",pos:"動",meaning:"腐る、腐敗する、ダメになる",comment:"",deck:"19"},
+{id:591,word:"sturdy",kana:"スターディー",pos:"形",meaning:"頑丈な",comment:"",deck:"19"},
+{id:592,word:"conclud",kana:"コンクルード",pos:"動",meaning:"結論づける",comment:"",deck:"19"},
+{id:593,word:"exhibit",kana:"エグジビット",pos:"動",meaning:"展示する",comment:"",deck:"19"},
+{id:594,word:"expose",kana:"エクスポウズ",pos:"動",meaning:"さらす",comment:"(0811)",deck:"19"},
+{id:595,word:"ancestor",kana:"アンセスター",pos:"名",meaning:"先祖",comment:"",deck:"19"},
+{id:596,word:"onlooker",kana:"オンルッカー",pos:"名",meaning:"見物客",comment:"",deck:"19"},
+{id:597,word:"throughout",kana:"スルーアウト",pos:"副",meaning:"至るところに",comment:"",deck:"19"}
 ];
 
 // ── STATE ────────────────────────────────────────────
@@ -969,6 +1005,11 @@ function speak(){
 }
 
 // ── HOME ─────────────────────────────────────────────
+function formatDate(ts){
+  const d=new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
 function updateHome(){
   const total=words.length;
   const weak=words.filter(w=>w.weak).length;
@@ -978,18 +1019,27 @@ function updateHome(){
   document.getElementById('statDecks').textContent=decks.length;
   document.getElementById('homeSubtitle').textContent=`${total}語 · ${decks.length}デッキ`;
 
-  // recent decks
+  const studiedMap=JSON.parse(localStorage.getItem('toeic_studied')||'{}');
+
+  // ③ 本日4デッキ達成バナー
+  const todayStr=new Date().toDateString();
+  const todayCount=Object.values(studiedMap).filter(t=>new Date(t).toDateString()===todayStr).length;
+  const banner=document.getElementById('achieveBanner');
+  if(todayCount>=4){ banner.style.display='flex'; } else { banner.style.display='none'; }
+
+  // recent decks（24時間以内）
   const recent=getRecentDecks();
   const rHead=document.getElementById('recentSectionHead');
   const rList=document.getElementById('recentDeckList');
   if(recent.length){
     rHead.style.display='';
-    rList.innerHTML=recent.sort().map(d=>{
+    rList.innerHTML=recent.sort((a,b)=>Number(a)-Number(b)).map(d=>{
       const dw=words.filter(w=>w.deck===d);
+      const t=studiedMap[d];
       return `<div class="deck-row recent-deck" onclick="startStudy('deck','${d}')">
         <div class="deck-dot recent"></div>
         <div class="deck-info"><div class="deck-name">デッキ ${d}</div><div class="deck-count">${dw.length}語</div></div>
-        <span class="recent-badge">最近</span>
+        <span class="recent-badge">${t?formatDate(t):''}</span>
       </div>`;
     }).join('');
   } else {
@@ -997,21 +1047,25 @@ function updateHome(){
     rList.innerHTML='';
   }
 
-  // all decks
-  document.getElementById('deckList').innerHTML=decks.sort().map(d=>{
+  // ② 全デッキ一覧（最終学習日付き）
+  document.getElementById('deckList').innerHTML=decks.sort((a,b)=>Number(a)-Number(b)).map(d=>{
     const dw=words.filter(w=>w.deck===d);
     const wk=dw.filter(w=>w.weak).length;
+    const t=studiedMap[d];
+    const rightEl=t
+      ?`<span class="deck-last-date">${formatDate(t)}</span>`
+      :`<span class="deck-prog">→</span>`;
     return `<div class="deck-row" onclick="startStudy('deck','${d}')">
       <div class="deck-dot"></div>
       <div class="deck-info"><div class="deck-name">デッキ ${d}</div><div class="deck-count">${dw.length}語${wk?` · 苦手${wk}語`:''}</div></div>
-      <div class="deck-prog">→</div>
+      ${rightEl}
     </div>`;
   }).join('');
 
   // populate deck select in manage
   const sel=document.getElementById('newDeck');
   const cur=sel.value;
-  sel.innerHTML=decks.sort().map(d=>`<option value="${d}">デッキ ${d}</option>`).join('')
+  sel.innerHTML=decks.sort((a,b)=>Number(a)-Number(b)).map(d=>`<option value="${d}">デッキ ${d}</option>`).join('')
     +'<option value="new">新しいデッキ…</option>';
   sel.value=cur||decks[0]||'new';
 }
@@ -1326,28 +1380,46 @@ async function initNotifications(){
     await Notification.requestPermission();
   }
   if(Notification.permission==='granted'){
-    scheduleNotifications();
+    fireScheduledNotifs();
   }
 }
 
-function scheduleNotifications(){
-  if(sessionStorage.getItem('notif_scheduled'))return;
-  sessionStorage.setItem('notif_scheduled','1');
+// アプリを開くたびに「今日まだ通知していない時刻」があれば即発火
+function fireScheduledNotifs(){
   const targets=[12,15,18,21];
   const now=new Date();
+  const todayStr=now.toDateString();
+  const firedKey='toeic_notif_fired';
+  const fired=JSON.parse(localStorage.getItem(firedKey)||'{}');
+  // 日付が変わったらリセット
+  if(fired.date!==todayStr){
+    localStorage.setItem(firedKey,JSON.stringify({date:todayStr,hours:[]}));
+    fired.date=todayStr;
+    fired.hours=[];
+  }
+  const nowH=now.getHours();
+  const nowM=now.getMinutes();
+  targets.forEach(hour=>{
+    // その時刻を今日まだ発火していない、かつ現在時刻がその時刻以降
+    const passed=(nowH>hour)||(nowH===hour&&nowM>=0);
+    if(passed&&!fired.hours.includes(hour)){
+      fired.hours.push(hour);
+      localStorage.setItem(firedKey,JSON.stringify(fired));
+      new Notification('📚 TOEIC単語帳',{
+        body:getRandMsg(hour),
+        tag:`toeic-${hour}-${todayStr}`,
+        renotify:true
+      });
+    }
+  });
+  // 次の未発火時刻にsetTimeoutでも仕掛ける
   targets.forEach(hour=>{
     const target=new Date();
-    target.setHours(hour,0,0,0);
+    target.setHours(hour,0,5,0); // 5秒マージン
     const diff=target-now;
-    if(diff>0){
+    if(diff>0&&diff<86400000){
       setTimeout(()=>{
-        if(Notification.permission==='granted'){
-          new Notification('📚 TOEIC単語帳',{
-            body:getRandMsg(hour),
-            tag:`toeic-${hour}`,
-            renotify:true
-          });
-        }
+        if(Notification.permission==='granted') fireScheduledNotifs();
       },diff);
     }
   });
