@@ -36,6 +36,27 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg)
 .achieve-banner{display:none;align-items:center;justify-content:center;gap:10px;margin:0 18px 0;padding:14px 18px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:16px;font-family:'Outfit',sans-serif;font-weight:800;font-size:16px;color:#1a1200;box-shadow:0 4px 20px rgba(251,191,36,.4);}
 .achieve-banner .achieve-icon{font-size:22px;}
 .deck-last-date{font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);white-space:nowrap;}
+.count-weak{color:var(--rose);font-weight:700;}
+.count-ok{color:var(--green);font-weight:700;}
+.deck-weak-btn{background:rgba(255,107,138,.15);border:1px solid rgba(255,107,138,.3);color:var(--rose);border-radius:10px;padding:6px 10px;font-size:11px;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s;}
+.deck-weak-btn:active{transform:scale(.93);background:rgba(255,107,138,.3);}
+
+/* 編集ボタン */
+.edit-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:var(--text2);width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.edit-btn:active{transform:scale(.9);background:rgba(255,255,255,.2);}
+
+/* 編集モーダル */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{background:var(--surface);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px;max-height:85vh;overflow-y:auto;}
+.modal-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.modal-label{font-size:11px;color:var(--text2);margin-bottom:3px;font-family:'Space Mono',monospace;letter-spacing:.05em;}
+.modal-input{background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;padding:10px 12px;outline:none;width:100%;transition:border .2s;}
+.modal-input:focus{border-color:var(--accent);}
+.modal-textarea{min-height:70px;resize:vertical;}
+.modal-btns{display:flex;gap:10px;margin-top:4px;}
+.modal-save{flex:1;background:var(--accent);border:none;color:#fff;border-radius:12px;padding:13px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer;}
+.modal-cancel{background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:12px;padding:13px 18px;font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;cursor:pointer;}
 .home-hero{padding:28px 20px 20px;text-align:center}
 .hero-logo{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.15em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
 .hero-title{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;line-height:1.15;color:var(--text)}
@@ -104,9 +125,9 @@ html,body{height:100%;font-family:'Noto Sans JP',sans-serif;background:var(--bg)
 /* BACK card */
 .back-kana{font-size:11px;color:var(--text2);margin-bottom:3px}
 .back-word{font-family:'Outfit',sans-serif;font-size:clamp(15px,3.5vw,20px);font-weight:700;color:var(--text);margin-bottom:10px}
-.back-pos{display:inline-block;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(79,138,255,.15);color:var(--accent);margin-bottom:10px}
+.back-pos{display:inline-block;font-family:'Noto Sans JP',sans-serif;font-size:17px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(79,138,255,.15);color:var(--accent);margin-bottom:10px}
 .back-meaning{font-size:clamp(22px,5.5vw,32px);font-weight:700;color:var(--text);line-height:1.4;flex:1;display:flex;align-items:center}
-.back-comment{font-size:11px;color:var(--text3);line-height:1.5;margin-top:auto;padding-top:8px;border-top:1px solid var(--border)}
+.back-comment{font-size:14px;color:var(--text3);line-height:1.6;margin-top:auto;padding-top:8px;border-top:1px solid var(--border)}
 .flip-hint{text-align:center;font-size:11px;color:var(--text3);margin-top:8px;display:flex;align-items:center;justify-content:center;gap:4px}
 
 /* ACTIONS - 苦手／覚えた／次へ順 */
@@ -255,7 +276,8 @@ select option{background:var(--surface)}
     <div class="card-wrap" id="cardWrap" onclick="flipCard()">
       <div class="flashcard" id="flashcard">
         <div class="face face-front">
-          <div class="card-corner">
+          <div class="card-corner" style="display:flex;gap:6px;align-items:center;">
+            <button class="edit-btn" onclick="event.stopPropagation();openEditModal()" title="編集">✏️</button>
             <button class="speak-btn" id="speakFront" onclick="event.stopPropagation();speak()">🔊</button>
           </div>
           <div class="card-deck-tag" id="frontDeck"></div>
@@ -264,7 +286,8 @@ select option{background:var(--surface)}
           <div class="card-comment" id="frontComment"></div>
         </div>
         <div class="face face-back">
-          <div class="card-corner">
+          <div class="card-corner" style="display:flex;gap:6px;align-items:center;">
+            <button class="edit-btn" onclick="event.stopPropagation();openEditModal()" title="編集">✏️</button>
             <button class="speak-btn" id="speakBack" onclick="event.stopPropagation();speak()">🔊</button>
           </div>
           <div class="back-kana" id="backKana"></div>
@@ -347,6 +370,37 @@ select option{background:var(--surface)}
       <button class="btn-primary" onclick="restartStudy()">🔄 もう一度</button>
       <button class="btn-secondary" onclick="studyWeak()">🔥 苦手だけ復習</button>
       <button class="btn-secondary" onclick="goHome()">🏠 ホームへ</button>
+    </div>
+  </div>
+</div>
+
+<!-- 編集モーダル -->
+<div class="modal-overlay" id="editModal" onclick="closeEditModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-title">✏️ カードを編集</div>
+    <div>
+      <div class="modal-label">英単語 / フレーズ</div>
+      <input class="modal-input" id="editWord" type="text">
+    </div>
+    <div>
+      <div class="modal-label">カタカナよみがな</div>
+      <input class="modal-input" id="editKana" type="text">
+    </div>
+    <div>
+      <div class="modal-label">品詞</div>
+      <input class="modal-input" id="editPos" type="text" placeholder="名・動・形・副…">
+    </div>
+    <div>
+      <div class="modal-label">意味</div>
+      <input class="modal-input" id="editMeaning" type="text">
+    </div>
+    <div>
+      <div class="modal-label">備考（Comment）</div>
+      <textarea class="modal-input modal-textarea" id="editComment"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeEditModal()">キャンセル</button>
+      <button class="modal-save" onclick="saveEditModal()">保存する</button>
     </div>
   </div>
 </div>
@@ -1027,7 +1081,7 @@ function updateHome(){
   const banner=document.getElementById('achieveBanner');
   if(todayCount>=4){ banner.style.display='flex'; } else { banner.style.display='none'; }
 
-  // recent decks（24時間以内）
+  // ③ recent decks（24時間以内）
   const recent=getRecentDecks();
   const rHead=document.getElementById('recentSectionHead');
   const rList=document.getElementById('recentDeckList');
@@ -1035,11 +1089,17 @@ function updateHome(){
     rHead.style.display='';
     rList.innerHTML=recent.sort((a,b)=>Number(a)-Number(b)).map(d=>{
       const dw=words.filter(w=>w.deck===d);
+      const wk=dw.filter(w=>w.weak).length;
+      const kn=dw.filter(w=>!w.weak).length;
       const t=studiedMap[d];
+      const weakBtn=wk>0?`<button class="deck-weak-btn" onclick="event.stopPropagation();startStudy('deckweak','${d}')">🔥 苦手${wk}</button>`:'';
       return `<div class="deck-row recent-deck" onclick="startStudy('deck','${d}')">
         <div class="deck-dot recent"></div>
-        <div class="deck-info"><div class="deck-name">デッキ ${d}</div><div class="deck-count">${dw.length}語</div></div>
-        <span class="recent-badge">${t?formatDate(t):''}</span>
+        <div class="deck-info">
+          <div class="deck-name">デッキ ${d}${t?` <span class='deck-last-date'>${formatDate(t)}</span>`:''}</div>
+          <div class="deck-count">全${dw.length}語 · <span class="count-weak">苦手${wk}</span> · <span class="count-ok">覚えた${kn}</span></div>
+        </div>
+        ${weakBtn}
       </div>`;
     }).join('');
   } else {
@@ -1047,18 +1107,21 @@ function updateHome(){
     rList.innerHTML='';
   }
 
-  // ② 全デッキ一覧（最終学習日付き）
+  // ① ② 全デッキ一覧（苦手数・覚えた数・苦手ボタン付き）
   document.getElementById('deckList').innerHTML=decks.sort((a,b)=>Number(a)-Number(b)).map(d=>{
     const dw=words.filter(w=>w.deck===d);
     const wk=dw.filter(w=>w.weak).length;
+    const kn=dw.filter(w=>!w.weak).length;
     const t=studiedMap[d];
-    const rightEl=t
-      ?`<span class="deck-last-date">${formatDate(t)}</span>`
-      :`<span class="deck-prog">→</span>`;
+    const dateEl=t?`<span class="deck-last-date">${formatDate(t)}</span>`:'';
+    const weakBtn=wk>0?`<button class="deck-weak-btn" onclick="event.stopPropagation();startStudy('deckweak','${d}')">🔥 苦手${wk}</button>`:'';
     return `<div class="deck-row" onclick="startStudy('deck','${d}')">
       <div class="deck-dot"></div>
-      <div class="deck-info"><div class="deck-name">デッキ ${d}</div><div class="deck-count">${dw.length}語${wk?` · 苦手${wk}語`:''}</div></div>
-      ${rightEl}
+      <div class="deck-info">
+        <div class="deck-name">デッキ ${d} ${dateEl}</div>
+        <div class="deck-count">全${dw.length}語 · <span class="count-weak">苦手${wk}</span> · <span class="count-ok">覚えた${kn}</span></div>
+      </div>
+      ${weakBtn}
     </div>`;
   }).join('');
 
@@ -1078,15 +1141,18 @@ function startStudy(mode,deckId){
   else if(mode==='weak'){
     deck=shuffle(words.filter(w=>w.weak));
     if(!deck.length){showToast('苦手単語がありません');return;}
+  } else if(mode==='deckweak'){
+    deck=shuffle(words.filter(w=>w.deck===deckId&&w.weak));
+    if(!deck.length){showToast('このデッキに苦手単語はありません');return;}
   } else {
     deck=shuffle(words.filter(w=>w.deck===deckId));
     saveDeckStudied(deckId);
   }
   idx=0;showScreen('study');
   const tag=document.getElementById('modeTag');
-  tag.className='mode-tag'+(mode==='weak'?' weak':'');
-  tag.textContent=mode==='all'?'全単語':mode==='weak'?'苦手単語':`デッキ ${deckId}`;
-  document.getElementById('studyTitle').textContent=mode==='deck'?`デッキ ${deckId}`:mode==='weak'?'苦手復習':'全単語';
+  tag.className='mode-tag'+((mode==='weak'||mode==='deckweak')?' weak':'');
+  tag.textContent=mode==='all'?'全単語':mode==='weak'?'苦手単語':mode==='deckweak'?`デッキ${deckId} 苦手`:`デッキ ${deckId}`;
+  document.getElementById('studyTitle').textContent=mode==='deck'?`デッキ ${deckId}`:mode==='deckweak'?`デッキ${deckId} 苦手`:mode==='weak'?'苦手復習':'全単語';
   document.getElementById('studyDeckLabel').textContent=`${deck.length}語`;
   renderCard();
 }
@@ -1105,7 +1171,7 @@ function renderCard(){
   document.getElementById('frontDeck').textContent=`DECK ${card.deck}`;
   document.getElementById('frontKana').textContent=card.kana||'';
   document.getElementById('frontWord').textContent=card.word;
-  document.getElementById('frontComment').textContent=card.comment||'';
+  document.getElementById('frontComment').textContent=''; // commentは裏面のみ表示
   // back
   document.getElementById('backKana').textContent=card.kana||'';
   document.getElementById('backWord').textContent=card.word;
@@ -1166,7 +1232,7 @@ function showResult(){
   document.getElementById('resultSub').textContent=`正解率 ${pct}% · ${total}語学習`;
 }
 function restartStudy(){startStudy(studyMode,studyDeckId);}
-function studyWeak(){startStudy('weak');}
+function studyWeak(){startStudy('deckweak',studyDeckId);}
 
 // ── MANAGE ────────────────────────────────────────────
 function goManage(){showScreen('manage');renderFilterChips();renderWordList();
@@ -1374,53 +1440,137 @@ function getRandMsg(hour){
   return list[Math.floor(Math.random()*list.length)];
 }
 
+// ── EDIT MODAL ──────────────────────────────────────
+function openEditModal(){
+  const card=deck[idx];
+  if(!card)return;
+  document.getElementById('editWord').value=card.word||'';
+  document.getElementById('editKana').value=card.kana||'';
+  document.getElementById('editPos').value=card.pos||'';
+  document.getElementById('editMeaning').value=card.meaning||'';
+  document.getElementById('editComment').value=card.comment||'';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('open');
+}
+function saveEditModal(){
+  const card=deck[idx];
+  if(!card)return;
+  const w=words.find(x=>x.id===card.id);
+  if(!w)return;
+  w.word=document.getElementById('editWord').value.trim()||w.word;
+  w.kana=document.getElementById('editKana').value.trim();
+  w.pos=document.getElementById('editPos').value.trim();
+  w.meaning=document.getElementById('editMeaning').value.trim()||w.meaning;
+  w.comment=document.getElementById('editComment').value.trim();
+  // deck内のカードも更新
+  Object.assign(card,{word:w.word,kana:w.kana,pos:w.pos,meaning:w.meaning,comment:w.comment});
+  saveData();
+  // カード表示を即更新
+  document.getElementById('frontKana').textContent=w.kana||'';
+  document.getElementById('frontWord').textContent=w.word;
+  document.getElementById('backKana').textContent=w.kana||'';
+  document.getElementById('backWord').textContent=w.word;
+  document.getElementById('backPos').textContent=w.pos?`【${w.pos}】`:'—';
+  document.getElementById('backMeaning').textContent=w.meaning;
+  document.getElementById('backComment').textContent=w.comment||'';
+  closeEditModal();
+  showToast('保存しました！');
+}
+
+// ── SERVICE WORKER & NOTIFICATIONS ──────────────────
+async function registerSW(){
+  if(!('serviceWorker' in navigator))return null;
+  try{
+    const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    await navigator.serviceWorker.ready;
+    return reg;
+  }catch(e){
+    console.log('SW登録失敗:', e);
+    return null;
+  }
+}
+
 async function initNotifications(){
   if(!('Notification' in window))return;
   if(Notification.permission==='default'){
     await Notification.requestPermission();
   }
-  if(Notification.permission==='granted'){
+  if(Notification.permission!=='granted')return;
+
+  const reg=await registerSW();
+  if(reg && reg.active){
+    scheduleSWNotifs(reg);
+  } else {
+    // フォールバック：SW未対応の場合はアプリ内タイマー
     fireScheduledNotifs();
   }
 }
 
-// アプリを開くたびに「今日まだ通知していない時刻」があれば即発火
+function scheduleSWNotifs(reg){
+  const targets=[12,15,18,21];
+  const now=new Date();
+  const todayStr=now.toDateString();
+  const firedKey='toeic_notif_fired';
+  const fired=JSON.parse(localStorage.getItem(firedKey)||'{}');
+  if(fired.date!==todayStr){
+    localStorage.setItem(firedKey,JSON.stringify({date:todayStr,hours:[]}));
+    fired.date=todayStr; fired.hours=[];
+  }
+
+  const schedules=[];
+  targets.forEach(hour=>{
+    const target=new Date();
+    target.setHours(hour,0,0,0);
+    const diff=target-now;
+    const passed=(now.getHours()>hour)||(now.getHours()===hour);
+
+    // 過去の時刻で未発火 → 即発火
+    if(passed && !fired.hours.includes(hour)){
+      fired.hours.push(hour);
+      localStorage.setItem(firedKey,JSON.stringify(fired));
+      reg.showNotification('📚 TOEIC単語帳',{
+        body:getRandMsg(hour),
+        tag:`toeic-${hour}-${todayStr}`,
+        renotify:true
+      });
+    }
+    // 未来の時刻 → SWにスケジュール送信
+    if(diff>0){
+      schedules.push({hour, delay:diff, msg:getRandMsg(hour)});
+    }
+  });
+
+  if(schedules.length && reg.active){
+    reg.active.postMessage({type:'SCHEDULE_NOTIFS', targets:schedules});
+  }
+}
+
 function fireScheduledNotifs(){
   const targets=[12,15,18,21];
   const now=new Date();
   const todayStr=now.toDateString();
   const firedKey='toeic_notif_fired';
   const fired=JSON.parse(localStorage.getItem(firedKey)||'{}');
-  // 日付が変わったらリセット
   if(fired.date!==todayStr){
     localStorage.setItem(firedKey,JSON.stringify({date:todayStr,hours:[]}));
-    fired.date=todayStr;
-    fired.hours=[];
+    fired.date=todayStr; fired.hours=[];
   }
   const nowH=now.getHours();
-  const nowM=now.getMinutes();
   targets.forEach(hour=>{
-    // その時刻を今日まだ発火していない、かつ現在時刻がその時刻以降
-    const passed=(nowH>hour)||(nowH===hour&&nowM>=0);
+    const passed=(nowH>hour)||(nowH===hour);
     if(passed&&!fired.hours.includes(hour)){
       fired.hours.push(hour);
       localStorage.setItem(firedKey,JSON.stringify(fired));
-      new Notification('📚 TOEIC単語帳',{
-        body:getRandMsg(hour),
-        tag:`toeic-${hour}-${todayStr}`,
-        renotify:true
-      });
+      new Notification('📚 TOEIC単語帳',{body:getRandMsg(hour),tag:`toeic-${hour}-${todayStr}`,renotify:true});
     }
   });
-  // 次の未発火時刻にsetTimeoutでも仕掛ける
   targets.forEach(hour=>{
-    const target=new Date();
-    target.setHours(hour,0,5,0); // 5秒マージン
+    const target=new Date(); target.setHours(hour,0,5,0);
     const diff=target-now;
     if(diff>0&&diff<86400000){
-      setTimeout(()=>{
-        if(Notification.permission==='granted') fireScheduledNotifs();
-      },diff);
+      setTimeout(()=>{if(Notification.permission==='granted')fireScheduledNotifs();},diff);
     }
   });
 }
