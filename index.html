@@ -1020,9 +1020,23 @@ let voices=[];
 function loadData(){
   const saved=localStorage.getItem('toeic_v2');
   const weakMap=JSON.parse(localStorage.getItem('toeic_weak')||'{}');
-  words=saved?JSON.parse(saved):RAW.map(w=>({...w,weak:false}));
+  if(saved){
+    const savedWords=JSON.parse(saved);
+    // savedWordsをIDでマップ化
+    const savedMap={};
+    savedWords.forEach(w=>{ savedMap[w.id]=w; });
+    // RAWをベースに、編集済みデータをマージ（IDが一致するものは編集内容を優先）
+    // RAWに存在しないIDは除外（増殖防止）
+    const rawIds=new Set(RAW.map(r=>r.id));
+    words=RAW.map(r=>{
+      const s=savedMap[r.id];
+      return s ? {...r, word:s.word, kana:s.kana, pos:s.pos, meaning:s.meaning, comment:s.comment, deck:s.deck||r.deck, weak:false} : {...r, weak:false};
+    });
+  } else {
+    words=RAW.map(w=>({...w,weak:false}));
+  }
+  // 苦手フラグを復元
   words.forEach(w=>{ w.weak=!!weakMap[w.id]; });
-  // ensure kana exists
   words.forEach(w=>{ if(!w.kana) w.kana=''; });
 }
 function saveData(){
@@ -1200,7 +1214,13 @@ function prevCard(){
   document.getElementById('flashcard').classList.remove('flipped');
   renderCard();
 }
-function markKnown(){sessionKnown++;swipeCard('right');}
+function markKnown(){
+  const card=deck[idx];
+  const w=words.find(x=>x.id===card.id);
+  // 「覚えた」を押したら苦手フラグを解除
+  if(w && w.weak){ w.weak=false; card.weak=false; saveData(); }
+  sessionKnown++;swipeCard('right');
+}
 function markWeak(){
   const card=deck[idx];
   const w=words.find(x=>x.id===card.id);
